@@ -1,0 +1,36 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ChartButlerCS.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ChartFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ServerURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://www.gat24.de/data.php?rubrik=aktuell&amp;unterrubrik=neues&amp;dokument=neues&amp;SID=0</Value>
+    </Setting>
+    <Setting Name="ServerUsername" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ServerPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ServerAirFieldURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://www.gat24.de/data.php?rubrik=briefing&amp;unterrubrik=flugplaetze&amp;dokument=karten&amp;ICAO=</Value>
+    </Setting>
+    <Setting Name="ServerAmendedURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://www.gat24.de/data.php?rubrik=aktuell&amp;unterrubrik=neues&amp;dokument=aip_aktuell&amp;SID=&amp;printable=true</Value>
+    </Setting>
+    <Setting Name="SavePW" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UpdateInterval" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">28</Value>
+    </Setting>
+    <Setting Name="ServerChartURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://www.gat24.de/dokumente/briefing/flugplaetze/pdfkarten.php?&amp;icao=</Value>
+    </Setting>
+    <Setting Name="ServerChartPreviewURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://www.gat24.de/image.php?bild=dokumente/briefing/flugplaetze/karten/</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
