@@ -2,13 +2,17 @@
 using System.ComponentModel;
 using System.Xml;
 using System.IO;
+using System.Text;
 using System;
+using System.Security.Cryptography;
 
 namespace ChartButlerCS
 {
     public class Settings : INotifyPropertyChanged
     {
         private static Settings defaultInstance = new Settings();
+
+        static byte[] s_aditionalEntropy = { 23, 42, 1, 6, 5 };
 
         private Dictionary<string, object> userSettings;
         private string fileName;
@@ -201,11 +205,28 @@ namespace ChartButlerCS
         {
             get
             {
-                return ((string)(this["ServerPassword"]));
+                try
+                {
+                    if (this["ServerPassword"] != null)
+                        return UTF8Encoding.UTF8.GetString(
+                            ProtectedData.Unprotect(
+                                Convert.FromBase64String((string)this["ServerPassword"]),
+                                s_aditionalEntropy, DataProtectionScope.CurrentUser));
+                    else
+                        return null;
+                }
+                catch (Exception) { }
+                return null;
             }
             set
             {
-                this["ServerPassword"] = value;
+                if (value != null)
+                    this["ServerPassword"] = Convert.ToBase64String(
+                        ProtectedData.Protect(
+                            UTF8Encoding.UTF8.GetBytes(value),
+                            s_aditionalEntropy,DataProtectionScope.CurrentUser));
+                else
+                    this["ServerPassword"] = null;
             }
         }
 
