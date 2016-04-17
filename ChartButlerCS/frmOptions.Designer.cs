@@ -117,18 +117,14 @@
             // 
             this.txtUser.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtUser.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::ChartButlerCS.Properties.Settings.Default, "ServerUsername", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.txtUser.Location = new System.Drawing.Point(14, 28);
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(336, 20);
             this.txtUser.TabIndex = 1;
-            this.txtUser.Text = global::ChartButlerCS.Properties.Settings.Default.ServerUsername;
             // 
             // chkSavePW
             // 
             this.chkSavePW.AutoSize = true;
-            this.chkSavePW.Checked = global::ChartButlerCS.Properties.Settings.Default.SavePW;
-            this.chkSavePW.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::ChartButlerCS.Properties.Settings.Default, "SavePW", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.chkSavePW.Location = new System.Drawing.Point(14, 62);
             this.chkSavePW.Name = "chkSavePW";
             this.chkSavePW.Size = new System.Drawing.Size(118, 17);
@@ -181,7 +177,6 @@
             this.txtChartPath.ReadOnly = true;
             this.txtChartPath.Size = new System.Drawing.Size(306, 20);
             this.txtChartPath.TabIndex = 0;
-            this.txtChartPath.Text = global::ChartButlerCS.Properties.Settings.Default.ChartFolder;
             // 
             // panel1
             // 

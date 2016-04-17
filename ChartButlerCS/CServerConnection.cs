@@ -125,21 +125,21 @@ namespace ChartButlerCS
                 sts.Show();
             Application.DoEvents();
             string pw = null;
-            if (Properties.Settings.Default.ServerPassword == null || Properties.Settings.Default.ServerPassword == "")
+            if (Settings.Default.ServerPassword == null || Settings.Default.ServerPassword == "")
             {
                 frmChartDB.InputBox("Passworteingabe", "Bitte geben Sie Ihr Login-Passwort ein:", ref pw, true);
             }
             else
             {
-                pw = Properties.Settings.Default.ServerPassword;
+                pw = Settings.Default.ServerPassword;
             }
             UTF8Encoding enc = new UTF8Encoding();            
-            string parameter = "txtBenutzername=" + Properties.Settings.Default.ServerUsername + "&txtPasswort=" + pw + "&btnSubmitLogin=Login";
+            string parameter = "txtBenutzername=" + Settings.Default.ServerUsername + "&txtPasswort=" + pw + "&btnSubmitLogin=Login";
             byte[] parByte = enc.GetBytes(parameter);
             string resultSet = "";
             try
             {
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(ChartButlerCS.Properties.Settings.Default.ServerURL);
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(ChartButlerCS.Settings.Default.ServerURL);
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = parByte.Length;
@@ -204,7 +204,7 @@ namespace ChartButlerCS
 
                     sts.txtProgress.AppendText("Lade Karten-Liste..." );
                     Application.DoEvents();
-                    string AFSite = ChartButlerCS.Properties.Settings.Default.ServerAirFieldURL + newField + "&SID=" + SID;
+                    string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + newField + "&SID=" + SID;
                     string afresult = GetURLText(AFSite);
                     LinkList = GetChartLinks(afresult);
                     if (LinkList == null)
@@ -266,7 +266,7 @@ namespace ChartButlerCS
         private void CheckForNewCharts()
         {
             // Datum des letzten AIP Updates ermitteln
-            string htmlText = GetURLText(InsertSID(Properties.Settings.Default.ServerAmendedURL, SID));
+            string htmlText = GetURLText(InsertSID(Settings.Default.ServerAmendedURL, SID));
             UpDate = DateTime.Parse(GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:").text);
 
             sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+"\n");
@@ -279,7 +279,7 @@ namespace ChartButlerCS
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + "\n");
-                if ((UpDate - lastUpdate).Days == Properties.Settings.Default.UpdateInterval)
+                if ((UpDate - lastUpdate).Days == Settings.Default.UpdateInterval)
                     full_update_required = false;
 
                 if (UpDate == lastUpdate)
@@ -348,7 +348,7 @@ namespace ChartButlerCS
                 {
                     sts.txtProgress.AppendText("Prüfe Karten...\n");
                     Application.DoEvents();
-                    string AFSite = ChartButlerCS.Properties.Settings.Default.ServerAirFieldURL + ICAO + "&SID=" + SID;
+                    string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + ICAO + "&SID=" + SID;
                     string afresult = GetURLText(AFSite);
                     LinkList = GetChartLinks(afresult);
                     sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
@@ -417,8 +417,8 @@ namespace ChartButlerCS
 
                 ChartLink lnk = new ChartLink();
                 lnk.crypt = ChartBuf.text;
-                lnk.pdfURL = ChartButlerCS.Properties.Settings.Default.ServerChartURL + lnk.crypt + "&SID=" + SID;
-                lnk.previewURL = ChartButlerCS.Properties.Settings.Default.ServerChartPreviewURL + previewBuf.text + "&SID=" + SID;
+                lnk.pdfURL = ChartButlerCS.Settings.Default.ServerChartURL + lnk.crypt + "&SID=" + SID;
+                lnk.previewURL = ChartButlerCS.Settings.Default.ServerChartPreviewURL + previewBuf.text + "&SID=" + SID;
 
                 ChartLinks.Add(lnk);                
             }
@@ -615,7 +615,7 @@ namespace ChartButlerCS
 
         public void CheckForNewField(string Searchstr, ref string FieldIcao)
         {
-            string AFSite = ChartButlerCS.Properties.Settings.Default.ServerAirFieldURL + Searchstr + "&SID=" + SID;
+            string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + Searchstr + "&SID=" + SID;
             string html = GetURLText(AFSite);
             string Field = GetTextBetween(html, "300px\">", "</td>").text;
             if (Field.Length != 0)

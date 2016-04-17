@@ -14,8 +14,8 @@ namespace ChartButlerCS
         public frmChartDB()
         {
             InitializeComponent();
-            cmdNewAF.Enabled = Properties.Settings.Default.ChartFolder.Length > 0 && Properties.Settings.Default.ServerUsername.Length > 0;
-            cmdUpdateCharts.Enabled = Properties.Settings.Default.ChartFolder.Length > 0 && Properties.Settings.Default.ServerUsername.Length > 0;
+            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
+            cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
         }
 
         private void frmChartDB_Load(object sender, EventArgs e)
@@ -209,7 +209,7 @@ namespace ChartButlerCS
 
                     try
                     {
-                        Directory.Delete(Path.Combine(Properties.Settings.Default.ChartFolder,node.Text), true);
+                        Directory.Delete(Path.Combine(Settings.Default.ChartFolder,node.Text), true);
                     }
                     catch(Exception)
                     {
@@ -258,8 +258,8 @@ namespace ChartButlerCS
             if (opts.ShowDialog(this) == DialogResult.OK && opts.m_ChartsPathChanged)
                 readDataBase();
 
-            cmdNewAF.Enabled = Properties.Settings.Default.ChartFolder.Length > 0 && Properties.Settings.Default.ServerUsername.Length > 0;
-            cmdUpdateCharts.Enabled = Properties.Settings.Default.ChartFolder.Length > 0 && Properties.Settings.Default.ServerUsername.Length > 0;
+            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
+            cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -282,15 +282,15 @@ namespace ChartButlerCS
             chartButlerDataSet.Clear();
             string windowTitle = "ChartButler(C) 2016 Jörg Pauly / Stefan Sichler";
 
-            if (Properties.Settings.Default.ChartFolder.Length > 0)
+            if (Settings.Default.ChartFolder.Length > 0)
             {
-                windowTitle += " - " + ChartButlerCS.Properties.Settings.Default.ChartFolder;
+                windowTitle += " - " + ChartButlerCS.Settings.Default.ChartFolder;
                 Text = windowTitle;
 
-                if (Directory.Exists(ChartButlerCS.Properties.Settings.Default.ChartFolder))
+                if (Directory.Exists(ChartButlerCS.Settings.Default.ChartFolder))
                 {
-                    Directory.SetCurrentDirectory(ChartButlerCS.Properties.Settings.Default.ChartFolder);
-                    string dbPath = Path.Combine(Properties.Settings.Default.ChartFolder, ".ChartButler.xml");
+                    Directory.SetCurrentDirectory(ChartButlerCS.Settings.Default.ChartFolder);
+                    string dbPath = Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml");
                     try
                     {
                         if (File.Exists(dbPath))
@@ -340,7 +340,7 @@ namespace ChartButlerCS
             // Da die Aktualität der Karten über die Previews geprüft wird, ist es
             // ein Problem, wenn diese nicht vorhanden sind.
             bool l_update_needed = false;
-            string[] dirList = Directory.GetDirectories(Properties.Settings.Default.ChartFolder.ToString());
+            string[] dirList = Directory.GetDirectories(Settings.Default.ChartFolder.ToString());
             foreach (string dirName in dirList)
             {
                 string strpDirName = Path.GetFileName(dirName);
@@ -381,11 +381,11 @@ namespace ChartButlerCS
         /// </summary>
         public void updateDataBase()
         {
-            if (Properties.Settings.Default.ChartFolder.Length > 0 && chartButlerDataSet.AFCharts.Count != 0)
+            if (Settings.Default.ChartFolder.Length > 0 && chartButlerDataSet.AFCharts.Count != 0)
             {
                 string tmpDbPath = Path.GetTempFileName();
                 chartButlerDataSet.WriteXml(tmpDbPath);
-                string dbPath = Path.Combine(Properties.Settings.Default.ChartFolder, ".ChartButler.xml");
+                string dbPath = Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml");
                 if (!CServerConnection.FileEquals(tmpDbPath, dbPath))
                 {
                     File.Delete(dbPath);
@@ -428,11 +428,11 @@ namespace ChartButlerCS
 
         public static string BuildChartPdfPath(ChartButlerDataSet.AFChartsRow chartRow)
         {
-            return Path.Combine(Path.Combine(Properties.Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), chartRow.Cname);
+            return Path.Combine(Path.Combine(Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), chartRow.Cname);
         }
         public static string BuildChartPreviewJpgPath(ChartButlerDataSet.AFChartsRow chartRow)
         {
-            return Path.Combine(Path.Combine(Properties.Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), "." + chartRow.Cname + "_preview.jpg");
+            return Path.Combine(Path.Combine(Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), "." + chartRow.Cname + "_preview.jpg");
         }
 
     }//END CLASS
