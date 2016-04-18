@@ -21,6 +21,19 @@ namespace ChartButlerCS
         private void frmChartDB_Load(object sender, EventArgs e)
         {
             readDataBase();
+
+            if (Settings.Default.ChartFolder.Length == 0 && Settings.Default.ServerUsername.Length == 0
+                && chartButlerDataSet.Airfields.Count == 0)
+            {
+                MessageBox.Show(this,
+                    "Willkommen bei ChartButler!\n\n" +
+                    "Zur Benutzung dieser Software wird ein GAT24 Benutzerkonto benötigt.\n\n" +
+                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis \n" +
+                    "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie \n" +
+                    "Ihre GAT24-Zugangsdaten ein.",
+                    "Willkommen");
+                cmdOptions_Click(this, new EventArgs());
+            }
         }
 
         private void frmChartDB_FormClosing(object sender, FormClosingEventArgs e)
