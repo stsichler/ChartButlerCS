@@ -1,4 +1,4 @@
-# ChartButlerCS
+# ChartButlerCS <img src="./ChartButlerCS/Icon1.png" width="64" height="64" align="left" /> 
 Vollständig überarbeitete Version von Jörg Pauly's ursprünglichem ChartButlerCS 
 - AIP-Charts von GAT24.de einfach nutzen und aktuell halten - 
 
