@@ -90,7 +90,7 @@
     <Compile Include="frmChartDB.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmChartDB.designer.cs">
+    <Compile Include="frmChartDB.Designer.cs">
       <DependentUpon>frmChartDB.cs</DependentUpon>
     </Compile>
     <Compile Include="frmHelp.cs">
