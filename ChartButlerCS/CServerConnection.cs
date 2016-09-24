@@ -6,6 +6,7 @@ using System.Net;
 using System.Windows.Forms;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Threading;
 
 namespace ChartButlerCS
 {
@@ -30,6 +31,11 @@ namespace ChartButlerCS
         /// Das Dataset aus frmChartDB
         /// </summary>
         ChartButlerDataSet chartButlerDataset;
+        /// <summary>
+        /// Text, der nach der Aktualisierung in einer MessageBox
+        /// angezeigt werden soll oder null, wenn alles ok war
+        /// </summary>
+        string errorText;
 
         /// <summary>
         /// Status Dialog, der den Fortschritt anzeigt.
@@ -112,22 +118,44 @@ namespace ChartButlerCS
             return good;
         }
 
+        public List<CChart> Establish(bool pUpdate = true, string newField = null)
+        {
+            m_Upd = pUpdate;
+            sts.CreateControl();
+			IntPtr dummy = sts.Handle;
+            Thread worker = new Thread(() =>
+               {
+                   try
+                   {
+                       ConnectionWorker(newField,dummy);
+                   }
+                   catch (Exception exc)
+                   {
+                       errorText = "Entschuldigung. \nEs gab einen unerwarteten Fehler: \n\n" + exc.ToString();
+                   }
+                   finally { sts.Invoke((MethodInvoker)delegate { sts.Close(); }); }
+               });
+            worker.Start();
+            sts.ShowDialog();
+            worker.Join ();
+            if (errorText != null)
+                MessageBox.Show(parent, errorText, "Fehler");
+            return cList;
+        }
+
         /// <summary>
         /// Verbindet mit den hinterlegten Login-Daten zum Server und sucht nach geänderten Karten.
         /// </summary>
         /// <returns>Der Seiten-Quelltext, nur zu Testzwecken.</returns>
-        public List<CChart> Establish(bool pUpdate = true, string newField = null, bool pQuiet = false)
+        private void ConnectionWorker(string newField, IntPtr dummy)
         {
-            m_Upd = pUpdate;
-            sts.progressBar.Maximum = (newField != null) ? 6 : (2 + (chartButlerDataset.Airfields.Count * 4));
-            sts.txtProgress.AppendText("Verbinde zu Server...");
-            if(!pQuiet)
-                sts.Show();
-            Application.DoEvents();
+            sts.Invoke((MethodInvoker)delegate {
+                sts.progressBar.Maximum = (newField != null) ? 6 : (2 + (chartButlerDataset.Airfields.Count * 4));
+                sts.txtProgress.AppendText("Verbinde zu Server..."); });
             string pw = null;
             if (Settings.Default.ServerPassword == null || Settings.Default.ServerPassword == "")
             {
-                frmChartDB.InputBox("Passworteingabe", "Bitte geben Sie Ihr Login-Passwort ein:", ref pw, true);
+                sts.Invoke((MethodInvoker)delegate { frmChartDB.InputBox("Passworteingabe", "Bitte geben Sie Ihr Login-Passwort ein:", ref pw, true); });
             }
             else
             {
@@ -155,20 +183,17 @@ namespace ChartButlerCS
             }
             catch (Exception) 
             {
-                sts.Close();
-                MessageBox.Show(parent,"Entschuldigung. \nDie Verbindung zum GAT24 Server \nkonnte nicht hergestellt werden.", "ChartButler");
-                return null;
+                errorText = "Entschuldigung. \nDie Verbindung zum GAT24 Server \nkonnte nicht hergestellt werden.";
+                return;
             }
             SID = GetSID(resultSet);
-            sts.progressBar.PerformStep();
-            Application.DoEvents();
+            sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
             if (SID == "0")
             {
-                sts.Close();
-                MessageBox.Show(parent,"Ihre Sitzung wurde vom GAT24-Server nicht authorisiert!\nBitte überprüfen Sie die Zugangsdaten.", "Authorisierungsfehler");
-                return null;
+                errorText= "Ihre Sitzung wurde vom GAT24-Server nicht authorisiert!\nBitte überprüfen Sie die Zugangsdaten.";
+                return;
             }
-            sts.txtProgress.AppendText("OK.\n");
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK.\n"); });
             if (m_Upd)
             {
                 CheckForNewCharts();
@@ -180,15 +205,14 @@ namespace ChartButlerCS
                 if (FieldName != null)
                 {
                     newField = newField.ToUpper();
-                    sts.txtProgress.AppendText("Hole neuen Flugplatz: " + newField + "\n");
-                    sts.txtProgress.AppendText("Erzeuge Datenbank-Einträge...");
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.txtProgress.AppendText("Hole neuen Flugplatz: " + newField + "\n");
+                        sts.txtProgress.AppendText("Erzeuge Datenbank-Einträge..."); });
                     ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(newField);
                     if (afrow != null)
                     {
-                        MessageBox.Show(parent,"Flugplatz " + newField + " ist bereits vorhanden.");
-                        sts.Close();
-                        return null;
+                        errorText="Flugplatz " + newField + " ist bereits vorhanden.";
+                        return;
                     }
 
                     // Kartenverzeichnis anlegen
@@ -199,61 +223,49 @@ namespace ChartButlerCS
                     afrow.AFname = FieldName;
                     chartButlerDataset.Airfields.AddAirfieldsRow(afrow);
 
-                    sts.txtProgress.AppendText("erledigt!\n");
-                    sts.progressBar.PerformStep();
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.txtProgress.AppendText("erledigt!\n");
+                        sts.progressBar.PerformStep();
 
-                    sts.txtProgress.AppendText("Lade Karten-Liste..." );
-                    Application.DoEvents();
+                        sts.txtProgress.AppendText("Lade Karten-Liste..." ); });
                     string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + newField + "&SID=" + SID;
                     string afresult = GetURLText(AFSite);
                     LinkList = GetChartLinks(afresult);
                     if (LinkList == null)
                     {
-                        MessageBox.Show(parent,"Es sind keine Karten verfügbar!");
-                        sts.Close();
-                        return null;
+                        errorText="Es sind keine Karten verfügbar!";
+                        return;
                     }
-                    sts.txtProgress.AppendText("erledigt!\n");
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.txtProgress.AppendText("erledigt!\n");
 
-                    sts.progressBar.Maximum = 3 + LinkList.Count;
-                    sts.progressBar.PerformStep();
-                    sts.txtProgress.AppendText("Hole Karten-Dateien ab...\n");
-                    Application.DoEvents();
+                        sts.progressBar.Maximum = 3 + LinkList.Count;
+                        sts.progressBar.PerformStep();
+                        sts.txtProgress.AppendText("Hole Karten-Dateien ab...\n"); });
 
                     foreach (ChartLink cl in LinkList)
                     {
                         DownloadAndCheckChart(cl, afrow);
-                        sts.progressBar.PerformStep();
-                        Application.DoEvents();
+                        sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
                     }
 
-                    sts.txtProgress.AppendText("erledigt!\n");
-                    sts.progressBar.Value = sts.progressBar.Maximum;
-                    for (int t = 0; t < 30; ++t)
-                    {
-                        Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.txtProgress.AppendText("erledigt!\n");
+                        sts.progressBar.Value = sts.progressBar.Maximum; });
+                    System.Threading.Thread.Sleep(3000);
                 }
                 else
                 {
-                    MessageBox.Show(parent,"Flugplatz " + newField + " nicht gefunden!", "Flugplatz-Suche", MessageBoxButtons.OK);
+                    errorText = "Flugplatz " + newField + " nicht gefunden!";
                 }
             }
-            sts.Close();
-            return cList;
         }
 
         private static void DownloadFileFromURL(string tmpPdfPath, string URL)
         {
             using (WebClient dlcl = new WebClient())
             {
-                dlcl.DownloadFileAsync(new Uri(URL), tmpPdfPath);
-                while (dlcl.IsBusy)
-                {
-                    Application.DoEvents();
-                    System.Threading.Thread.Sleep(10);
-                }
+                dlcl.DownloadFile(new Uri(URL), tmpPdfPath);
             }
         }
 
@@ -269,7 +281,7 @@ namespace ChartButlerCS
             string htmlText = GetURLText(InsertSID(Settings.Default.ServerAmendedURL, SID));
             UpDate = DateTime.Parse(GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:").text);
 
-            sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+"\n");
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+"\n"); });
 
             bool full_update_required = true;
 
@@ -278,20 +290,16 @@ namespace ChartButlerCS
             else
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
-                sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + "\n");
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + "\n"); });
                 if ((UpDate - lastUpdate).Days == Settings.Default.UpdateInterval)
                     full_update_required = false;
 
                 if (UpDate == lastUpdate)
                 {
-                    sts.txtProgress.AppendText("\nKeine Aktualisierung notwendig!\n");
-                    sts.progressBar.Value = sts.progressBar.Maximum;
-                    for (int t = 0; t < 30; ++t)
-                    {
-                        Application.DoEvents();
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    sts.Close(); 
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.txtProgress.AppendText("\nKeine Aktualisierung notwendig!\n");
+                        sts.progressBar.Value = sts.progressBar.Maximum; });
+                    System.Threading.Thread.Sleep(3000);
                     return;
                 }
 
@@ -300,8 +308,7 @@ namespace ChartButlerCS
 
             if (full_update_required)
             {
-                sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze...\n");
-                Application.DoEvents();
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze...\n"); });
 
                 ChartButlerDataSet.AirfieldsDataTable d = chartButlerDataset.Airfields;
                 for (int j = 0; j < d.Count; ++j)
@@ -309,8 +316,7 @@ namespace ChartButlerCS
             }
             else
             {
-                sts.txtProgress.AppendText("Überprüfe berichtigte Flugplätze...\n");
-                Application.DoEvents();
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe berichtigte Flugplätze...\n"); });
 
                 int i = 0;
                 int lasti = 0;
@@ -324,8 +330,9 @@ namespace ChartButlerCS
                     AFlist.Add(Icao.text);
                 }
             }
-            sts.progressBar.Maximum = 2 + AFlist.Count * 4;
-            sts.progressBar.PerformStep();
+            sts.Invoke((MethodInvoker)delegate {
+                sts.progressBar.Maximum = 2 + AFlist.Count * 4;
+                sts.progressBar.PerformStep(); });
 
             UpdateCharts(AFlist);
         }
@@ -337,45 +344,36 @@ namespace ChartButlerCS
         /// <param name="AFlist">Die Liste der amendierten Flugplätze.</param>
         public void UpdateCharts(List<string> AFlist)
         {
-            sts.txtProgress.AppendText("Scanne Airfields...\n");
-            Application.DoEvents();
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Scanne Airfields...\n"); });
             foreach (string ICAO in AFlist)
             {
-                sts.txtProgress.AppendText("Prüfe " + ICAO + "... ");
-                Application.DoEvents();
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe " + ICAO + "... "); });
                 ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(ICAO);
                 if (afrow != null)
                 {
-                    sts.txtProgress.AppendText("Prüfe Karten...\n");
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten...\n"); });
                     string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + ICAO + "&SID=" + SID;
                     string afresult = GetURLText(AFSite);
                     LinkList = GetChartLinks(afresult);
-                    sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
-                    sts.progressBar.PerformStep();
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
+                        sts.progressBar.PerformStep(); });
                     foreach (ChartLink cl in LinkList)
                     {
                         DownloadAndCheckChart(cl, afrow);
-                        sts.progressBar.PerformStep();
-                        Application.DoEvents();
+                        sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
                     }
                 }
                 else
                 {
-                    sts.txtProgress.AppendText("Nicht abonniert!\n");
-                    sts.progressBar.Value += 4;
-                    Application.DoEvents();                    
+                    sts.Invoke((MethodInvoker)delegate {
+                        sts.txtProgress.AppendText("Nicht abonniert!\n");
+                        sts.progressBar.Value += 4; });
                 }                                                
             }
             sts.txtProgress.AppendText("\nAktualisierung beendet.\n");
-            sts.progressBar.Value = sts.progressBar.Maximum;
-            for (int t = 0; t < 30; ++t)
-            {
-                Application.DoEvents();
-                System.Threading.Thread.Sleep(100);
-            }
-            sts.Close(); 
+            sts.Invoke((MethodInvoker)delegate { sts.progressBar.Value = sts.progressBar.Maximum; });
+            System.Threading.Thread.Sleep(3000);
         }
 
         /// <summary>
@@ -448,8 +446,7 @@ namespace ChartButlerCS
                     bsCH.Position = tpos;
                     chartRow = (ChartButlerDataSet.AFChartsRow)((System.Data.DataRowView)bsCH.Current).Row;
 
-                    sts.txtProgress.AppendText(chartRow.Cname + " ... ");
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(chartRow.Cname + " ... "); });
                 }
                 else
                 {
@@ -463,8 +460,7 @@ namespace ChartButlerCS
                     else
                         Cname = afrow.ICAO + "_" + "UnknownChart" + previewName + ".pdf";
 
-                    sts.txtProgress.AppendText(Cname + " ... ");
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(Cname + " ... "); });
 
                     bsCH.Position = 0;
                     tpos = bsCH.Find("Cname", Cname);
@@ -489,16 +485,14 @@ namespace ChartButlerCS
 
                 if (m_Upd && !is_new_chart && FileEquals(tmpPreviewPath, previewPath))
                 {
-                    sts.txtProgress.AppendText("ist aktuell.\n");
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("ist aktuell.\n"); });
                 }
                 else
                 {
                     if (is_new_chart)
-                        sts.txtProgress.AppendText("wird hinzugefügt... ");
+                        sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("wird hinzugefügt... "); });
                     else
-                        sts.txtProgress.AppendText("wird aktualisiert... ");
-                    Application.DoEvents();
+                        sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("wird aktualisiert... "); });
 
                     File.Delete(CFullPath);
                     DownloadFileFromURL(CFullPath, chartLink.pdfURL);
@@ -526,8 +520,7 @@ namespace ChartButlerCS
                     if (is_new_chart)
                         chartButlerDataset.AFCharts.AddAFChartsRow(chartRow);
 
-                    sts.txtProgress.AppendText("OK.\n");
-                    Application.DoEvents();
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK.\n"); });
 
                     CChart crt = new CChart();
                     crt.SetChartName(chartRow.Cname);
@@ -637,7 +630,7 @@ namespace ChartButlerCS
                 }
                 Field = buf;
                 FieldIcao = Field;
-                sts.txtProgress.AppendText("Platz erkannt: " + Field + "\n");
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Platz erkannt: " + Field + "\n"); });
             }
         }
 

@@ -4,12 +4,13 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.Remoting.Contexts;
 
 namespace ChartButlerCS
 {
+    [Synchronization]
     public partial class frmChartDB : Form
     {
-        private bool lQuiet = false;
         private List<CChart> clist = new List<CChart>();
         public frmChartDB()
         {
@@ -237,10 +238,10 @@ namespace ChartButlerCS
         private void cmdUpdateCharts_Click(object sender, EventArgs e)
         {
             CServerConnection cConn = new CServerConnection(this,chartButlerDataSet);            
-            clist = cConn.Establish(true, null, lQuiet);
+            clist = cConn.Establish(true, null);
             updateTreeView(); 
             updateDataBase();
-            if (clist != null && clist.Count != 0 && !lQuiet)
+            if (clist != null && clist.Count != 0)
             {
                 CUpdateOverview cupov = new CUpdateOverview(clist);
                 cupov.Show(this);
