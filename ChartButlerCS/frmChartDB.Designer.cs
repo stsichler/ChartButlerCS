@@ -44,8 +44,11 @@
             this.cmdHelp = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.chartButlerDataSet = new ChartButlerCS.ChartButlerDataSet();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.panel_UpdateRequired = new System.Windows.Forms.Panel();
+            this.label_Hinweis = new System.Windows.Forms.Label();
+            this.panel4 = new System.Windows.Forms.Panel();
+            this.chartButlerDataSet = new ChartButlerCS.ChartButlerDataSet();
             this.contextMenuStrip1.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -53,8 +56,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.previewPictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartButlerDataSet)).BeginInit();
             this.panel2.SuspendLayout();
+            this.panel_UpdateRequired.SuspendLayout();
+            this.panel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartButlerDataSet)).BeginInit();
             this.SuspendLayout();
             // 
             // treeView1
@@ -63,7 +68,7 @@
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
             this.treeView1.PathSeparator = "";
-            this.treeView1.Size = new System.Drawing.Size(221, 454);
+            this.treeView1.Size = new System.Drawing.Size(188, 423);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseClick);
@@ -96,8 +101,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.previewPictureBox);
-            this.splitContainer1.Size = new System.Drawing.Size(546, 454);
-            this.splitContainer1.SplitterDistance = 221;
+            this.splitContainer1.Size = new System.Drawing.Size(466, 423);
+            this.splitContainer1.SplitterDistance = 188;
             this.splitContainer1.TabIndex = 4;
             // 
             // previewPictureBox
@@ -106,7 +111,7 @@
             this.previewPictureBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.previewPictureBox.Location = new System.Drawing.Point(0, 0);
             this.previewPictureBox.Name = "previewPictureBox";
-            this.previewPictureBox.Size = new System.Drawing.Size(321, 454);
+            this.previewPictureBox.Size = new System.Drawing.Size(274, 423);
             this.previewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.previewPictureBox.TabIndex = 0;
             this.previewPictureBox.TabStop = false;
@@ -117,7 +122,7 @@
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(4, 162);
+            this.pictureBox1.Location = new System.Drawing.Point(4, 146);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(222, 200);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -151,7 +156,7 @@
             // cmdClose
             // 
             this.cmdClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdClose.Location = new System.Drawing.Point(4, 419);
+            this.cmdClose.Location = new System.Drawing.Point(4, 388);
             this.cmdClose.Name = "cmdClose";
             this.cmdClose.Size = new System.Drawing.Size(222, 39);
             this.cmdClose.TabIndex = 5;
@@ -173,7 +178,7 @@
             // cmdHelp
             // 
             this.cmdHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdHelp.Location = new System.Drawing.Point(4, 374);
+            this.cmdHelp.Location = new System.Drawing.Point(4, 343);
             this.cmdHelp.Name = "cmdHelp";
             this.cmdHelp.Size = new System.Drawing.Size(222, 39);
             this.cmdHelp.TabIndex = 4;
@@ -186,7 +191,7 @@
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(38, 141);
+            this.label1.Location = new System.Drawing.Point(38, 125);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(149, 18);
             this.label1.TabIndex = 3;
@@ -203,17 +208,12 @@
             this.panel1.Controls.Add(this.cmdOptions);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(554, 0);
+            this.panel1.Location = new System.Drawing.Point(474, 0);
             this.panel1.MinimumSize = new System.Drawing.Size(222, 412);
             this.panel1.Name = "panel1";
             this.panel1.Padding = new System.Windows.Forms.Padding(4);
-            this.panel1.Size = new System.Drawing.Size(230, 462);
+            this.panel1.Size = new System.Drawing.Size(230, 431);
             this.panel1.TabIndex = 1;
-            // 
-            // chartButlerDataSet
-            // 
-            this.chartButlerDataSet.DataSetName = "ChartButlerDataSet";
-            this.chartButlerDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // panel2
             // 
@@ -222,16 +222,54 @@
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
             this.panel2.Padding = new System.Windows.Forms.Padding(4);
-            this.panel2.Size = new System.Drawing.Size(554, 462);
+            this.panel2.Size = new System.Drawing.Size(474, 431);
             this.panel2.TabIndex = 0;
+            // 
+            // panel_UpdateRequired
+            // 
+            this.panel_UpdateRequired.BackColor = System.Drawing.Color.DarkRed;
+            this.panel_UpdateRequired.Controls.Add(this.label_Hinweis);
+            this.panel_UpdateRequired.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel_UpdateRequired.ForeColor = System.Drawing.Color.White;
+            this.panel_UpdateRequired.Location = new System.Drawing.Point(0, 0);
+            this.panel_UpdateRequired.Name = "panel_UpdateRequired";
+            this.panel_UpdateRequired.Size = new System.Drawing.Size(704, 30);
+            this.panel_UpdateRequired.TabIndex = 2;
+            this.panel_UpdateRequired.Visible = false;
+            // 
+            // label_Hinweis
+            // 
+            this.label_Hinweis.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label_Hinweis.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_Hinweis.Location = new System.Drawing.Point(12, 9);
+            this.label_Hinweis.Name = "label_Hinweis";
+            this.label_Hinweis.Size = new System.Drawing.Size(680, 13);
+            this.label_Hinweis.TabIndex = 0;
+            this.label_Hinweis.Text = "(Hinweis)";
+            this.label_Hinweis.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // panel4
+            // 
+            this.panel4.Controls.Add(this.panel2);
+            this.panel4.Controls.Add(this.panel1);
+            this.panel4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel4.Location = new System.Drawing.Point(0, 30);
+            this.panel4.Name = "panel4";
+            this.panel4.Size = new System.Drawing.Size(704, 431);
+            this.panel4.TabIndex = 3;
+            // 
+            // chartButlerDataSet
+            // 
+            this.chartButlerDataSet.DataSetName = "ChartButlerDataSet";
+            this.chartButlerDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // frmChartDB
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 462);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
+            this.ClientSize = new System.Drawing.Size(704, 461);
+            this.Controls.Add(this.panel4);
+            this.Controls.Add(this.panel_UpdateRequired);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(720, 500);
             this.Name = "frmChartDB";
@@ -245,8 +283,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartButlerDataSet)).EndInit();
             this.panel2.ResumeLayout(false);
+            this.panel_UpdateRequired.ResumeLayout(false);
+            this.panel4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chartButlerDataSet)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -269,5 +309,8 @@
         private System.Windows.Forms.PictureBox previewPictureBox;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel panel_UpdateRequired;
+        private System.Windows.Forms.Label label_Hinweis;
+        private System.Windows.Forms.Panel panel4;
     }
 }

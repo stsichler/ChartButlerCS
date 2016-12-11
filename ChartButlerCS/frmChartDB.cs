@@ -23,6 +23,8 @@ namespace ChartButlerCS
         {
             readDataBase();
 
+            updateUpdateRequiredPanel();
+
             if (Settings.Default.ChartFolder.Length == 0 && Settings.Default.ServerUsername.Length == 0
                 && chartButlerDataSet.Airfields.Count == 0)
             {
@@ -105,6 +107,35 @@ namespace ChartButlerCS
                 }
             }
             treeView1.ResumeLayout();
+        }
+
+        private void updateUpdateRequiredPanel()
+        {
+            if (chartButlerDataSet.Airfields.Count != 0)
+            {
+                if (chartButlerDataSet.AIP.Count == 0)
+                {
+                    label_Hinweis.Text = "Bitte führen Sie einen Abgleich der Karten mit dem Server durch!";
+                    panel_UpdateRequired.Visible = true;
+                }
+                else
+                {
+                    DateTime lastUpdate = chartButlerDataSet.AIP[0].LastUpdate;
+                    int age = (DateTime.Now.Date - lastUpdate).Days;
+
+                    if (age >= Settings.Default.UpdateInterval)
+                    {
+                        label_Hinweis.Text = "Die Karten wurden zuletzt vor "+age+" Tagen mit dem Server abgeglichen und sollten daher aktualisiert werden!";
+                        panel_UpdateRequired.Visible = true;
+                    }
+                    else
+                        panel_UpdateRequired.Visible = false;
+                }
+            }
+            else
+                panel_UpdateRequired.Visible = false;
+
+            PerformLayout();
         }
 
         private void cmdClose_Click(object sender, EventArgs e)
@@ -239,6 +270,7 @@ namespace ChartButlerCS
         {
             CServerConnection cConn = new CServerConnection(this,chartButlerDataSet);            
             clist = cConn.Establish(true, null);
+            updateUpdateRequiredPanel();
             updateTreeView(); 
             updateDataBase();
             if (clist != null && clist.Count != 0)
@@ -271,6 +303,7 @@ namespace ChartButlerCS
             frmOptions opts = new frmOptions();
             if (opts.ShowDialog(this) == DialogResult.OK && opts.m_ChartsPathChanged)
                 readDataBase();
+            updateUpdateRequiredPanel();
 
             cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
             cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
