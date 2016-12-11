@@ -371,8 +371,10 @@ namespace ChartButlerCS
                         sts.progressBar.Value += 4; });
                 }                                                
             }
-            sts.txtProgress.AppendText("\nAktualisierung beendet.\n");
-            sts.Invoke((MethodInvoker)delegate { sts.progressBar.Value = sts.progressBar.Maximum; });
+            
+            sts.Invoke((MethodInvoker)delegate {
+                sts.txtProgress.AppendText("\nAktualisierung beendet.\n");
+                sts.progressBar.Value = sts.progressBar.Maximum; });
             System.Threading.Thread.Sleep(3000);
         }
 
