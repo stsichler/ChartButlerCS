@@ -231,7 +231,7 @@ namespace ChartButlerCS
                     string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + newField + "&SID=" + SID;
                     string afresult = GetURLText(AFSite);
                     LinkList = GetChartLinks(afresult);
-                    if (LinkList == null)
+                    if (LinkList.Count == 0)
                     {
                         errorText="Es sind keine Karten verfügbar!";
                         return;
@@ -243,9 +243,10 @@ namespace ChartButlerCS
                         sts.progressBar.PerformStep();
                         sts.txtProgress.AppendText("Hole Karten-Dateien ab...\n"); });
 
+                    bool update_tripkit = true;
                     foreach (ChartLink cl in LinkList)
                     {
-                        DownloadAndCheckChart(cl, afrow);
+                        DownloadAndCheckChart(cl, afrow, ref update_tripkit);
                         sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
                     }
 
@@ -284,6 +285,8 @@ namespace ChartButlerCS
             sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+"\n"); });
 
             bool full_update_required = true;
+            bool same_chartbutler_version = (chartButlerDataset.ChartButler.Count != 0 
+                && chartButlerDataset.ChartButler[0].Version == System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             if (chartButlerDataset.AIP.Count == 0)
                 chartButlerDataset.AIP.AddAIPRow(UpDate);
@@ -291,10 +294,10 @@ namespace ChartButlerCS
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + "\n"); });
-                if ((UpDate - lastUpdate).Days == Settings.Default.UpdateInterval)
+                if ((UpDate - lastUpdate).Days == Settings.Default.UpdateInterval && same_chartbutler_version)
                     full_update_required = false;
 
-                if (UpDate == lastUpdate)
+                if (UpDate == lastUpdate && same_chartbutler_version)
                 {
                     sts.Invoke((MethodInvoker)delegate {
                         sts.txtProgress.AppendText("\nKeine Aktualisierung notwendig!\n");
@@ -358,9 +361,10 @@ namespace ChartButlerCS
                     sts.Invoke((MethodInvoker)delegate {
                         sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
                         sts.progressBar.PerformStep(); });
+                    bool tripkit_needs_update = false;
                     foreach (ChartLink cl in LinkList)
                     {
-                        DownloadAndCheckChart(cl, afrow);
+                        DownloadAndCheckChart(cl, afrow, ref tripkit_needs_update);
                         sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
                     }
                 }
@@ -393,34 +397,49 @@ namespace ChartButlerCS
         /// Stellt die Liste der Download-Links für geänderte Charts bereit.
         /// </summary>
         /// <param name="AFstream">Der HTML-Quelltext, der die Links enthält.</param>
-        /// <returns>Ein Stringarray mit den Download-Links.</returns>
+        /// <returns>Ein Liste mit den Download-Links. Das TripKit PDF, falls vorhanden, wird als letztes hinzugefügt.</returns>
         private List<ChartLink> GetChartLinks(string AFstream)
         {
             List<ChartLink> ChartLinks = new List<ChartLink>();
             int lpos = AFstream.IndexOf("pdfkarten.php?&icao=");
-            if (lpos == -1)
+            if (lpos != -1)
             {
-                return null;
+                int fstlpos = lpos;
+                while (lpos >= fstlpos)
+                {
+                    TextPos ChartBuf = GetTextBetween(AFstream, "pdfkarten.php?&icao=", "&", lpos);
+                    lpos = ChartBuf.pos;
+                    if (lpos < fstlpos || ChartBuf.text.Contains("W3C"))
+                        break;
+
+                    TextPos previewBuf = GetTextBetween(AFstream, "flugplaetze/karten/", "&", lpos);
+                    lpos = previewBuf.pos;
+                    if (lpos < fstlpos || ChartBuf.text.Contains("W3C"))
+                        break;
+
+                    ChartLink lnk = new ChartLink();
+                    lnk.crypt = ChartBuf.text;
+                    lnk.pdfURL = ChartButlerCS.Settings.Default.ServerChartURL + lnk.crypt + "&SID=" + SID;
+                    lnk.previewURL = ChartButlerCS.Settings.Default.ServerChartPreviewURL + previewBuf.text + "&SID=" + SID;
+
+                    ChartLinks.Add(lnk);
+                }
             }
-            int fstlpos = lpos;
-            while ( lpos >= fstlpos)
+            lpos = AFstream.IndexOf("pdftripkit.php?icao=");
+            if (lpos != -1)
             {
-                TextPos ChartBuf = GetTextBetween(AFstream, "pdfkarten.php?&icao=", "&", lpos);
-                lpos = ChartBuf.pos;
-                if (lpos < fstlpos || ChartBuf.text.Contains("W3C"))
-                    break;
+                int fstlpos = lpos;
+                TextPos TripKitBuf = GetTextBetween(AFstream, "pdftripkit.php?icao=", "&", lpos);
+                lpos = TripKitBuf.pos;
+                if (lpos >= fstlpos && !TripKitBuf.text.Contains("W3C"))
+                {
+                    ChartLink lnk = new ChartLink();
+                    lnk.crypt = TripKitBuf.text;
+                    lnk.pdfURL = ChartButlerCS.Settings.Default.ServerTripKitURL + lnk.crypt + "&SID=" + SID;
+                    lnk.previewURL = "tripkit";
 
-                TextPos previewBuf = GetTextBetween(AFstream, "flugplaetze/karten/", "&", lpos);
-                lpos = previewBuf.pos;
-                if (lpos < fstlpos || ChartBuf.text.Contains("W3C"))
-                    break;
-
-                ChartLink lnk = new ChartLink();
-                lnk.crypt = ChartBuf.text;
-                lnk.pdfURL = ChartButlerCS.Settings.Default.ServerChartURL + lnk.crypt + "&SID=" + SID;
-                lnk.previewURL = ChartButlerCS.Settings.Default.ServerChartPreviewURL + previewBuf.text + "&SID=" + SID;
-
-                ChartLinks.Add(lnk);                
+                    ChartLinks.Add(lnk);
+                }
             }
             return ChartLinks;
         }
@@ -429,7 +448,8 @@ namespace ChartButlerCS
         /// Prüft, ob eine Karte ersetzt werden muss und lädt diese dann herunter.
         /// </summary>
         /// <param name="chartLink">Der Download-Link zur Karte.</param>
-        private void DownloadAndCheckChart(ChartLink chartLink, ChartButlerDataSet.AirfieldsRow afrow)
+        /// <returns>True, falls die Karte neu angelegt oder ersetzt wurde.</returns>
+        private bool DownloadAndCheckChart(ChartLink chartLink, ChartButlerDataSet.AirfieldsRow afrow, ref bool tripkit_needs_update)
         {
             string tmpPreviewPath = Path.GetTempFileName();
             string tmpPdfPath = Path.GetTempFileName();
@@ -438,6 +458,7 @@ namespace ChartButlerCS
             {
                 ChartButlerDataSet.AFChartsRow chartRow;
                 bool is_new_chart = false;
+                bool is_tripkit_chart = (chartLink.previewURL == "tripkit");
 
                 BindingSource bsCH = new BindingSource(chartButlerDataset, "AFcharts");
                 bsCH.Position = 0;
@@ -453,14 +474,19 @@ namespace ChartButlerCS
                 else
                 {
                     // Cname aus Preview Pfad "erraten"
-                    string previewName = GetTextBetween(chartLink.previewURL, afrow.ICAO.ToLower() + "_", ".jpg").text;
                     string Cname;
-                    if (previewName.StartsWith("voc"))
-                        Cname = afrow.ICAO + "_" + "VisualOperationChart" + previewName.Substring(3) + ".pdf";
-                    else if (previewName.StartsWith("adc"))
-                        Cname = afrow.ICAO + "_" + "AerodromeChart" + previewName.Substring(3) + ".pdf";
+                    if (is_tripkit_chart)
+                        Cname = afrow.ICAO + "_" + "TripKit_Charts.pdf";
                     else
-                        Cname = afrow.ICAO + "_" + "UnknownChart" + previewName + ".pdf";
+                    {
+                        string previewName = GetTextBetween(chartLink.previewURL, afrow.ICAO.ToLower() + "_", ".jpg").text;
+                        if (previewName.StartsWith("voc"))
+                            Cname = afrow.ICAO + "_" + "VisualOperationChart" + previewName.Substring(3) + ".pdf";
+                        else if (previewName.StartsWith("adc"))
+                            Cname = afrow.ICAO + "_" + "AerodromeChart" + previewName.Substring(3) + ".pdf";
+                        else
+                            Cname = afrow.ICAO + "_" + "UnknownChart" + previewName + ".pdf";
+                    }
 
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(Cname + " ... "); });
 
@@ -481,13 +507,16 @@ namespace ChartButlerCS
                     chartRow.Crypt = chartLink.crypt;
                 }
 
-                DownloadFileFromURL(tmpPreviewPath, chartLink.previewURL);
+                if (!is_tripkit_chart)
+                    DownloadFileFromURL(tmpPreviewPath, chartLink.previewURL);
                 string CFullPath = frmChartDB.BuildChartPdfPath(chartRow);
-                string previewPath = frmChartDB.BuildChartPreviewJpgPath(chartRow);
+                string previewPath = is_tripkit_chart ? "" : frmChartDB.BuildChartPreviewJpgPath(chartRow);
 
-                if (m_Upd && !is_new_chart && FileEquals(tmpPreviewPath, previewPath))
+                if (m_Upd && !is_new_chart 
+                    && ((is_tripkit_chart && !tripkit_needs_update) || (!is_tripkit_chart && FileEquals(tmpPreviewPath, previewPath))))
                 {
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("ist aktuell.\n"); });
+                    return false;
                 }
                 else
                 {
@@ -499,9 +528,13 @@ namespace ChartButlerCS
                     File.Delete(CFullPath);
                     DownloadFileFromURL(CFullPath, chartLink.pdfURL);
 
-                    File.Delete(previewPath);                    
-                    File.SetAttributes(tmpPreviewPath, FileAttributes.Hidden);
-                    File.Move(tmpPreviewPath, previewPath);
+                    if (!is_tripkit_chart)
+                    {
+                        tripkit_needs_update = true;
+                        File.Delete(previewPath);
+                        File.SetAttributes(tmpPreviewPath, FileAttributes.Hidden);
+                        File.Move(tmpPreviewPath, previewPath);
+                    }
 
                     chartRow.CreationDate = File.GetLastWriteTime(CFullPath).Date;
 
@@ -528,6 +561,7 @@ namespace ChartButlerCS
                     crt.SetChartName(chartRow.Cname);
                     crt.SetChartPath(CFullPath);
                     cList.Add(crt);
+                    return true;
                 }
             }
             finally

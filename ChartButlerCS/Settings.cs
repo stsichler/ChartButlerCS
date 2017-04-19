@@ -173,6 +173,13 @@ namespace ChartButlerCS
             }
         }
 
+        public string ServerTripKitURL
+        {
+            get
+            {
+                return "https://www.gat24.de/dokumente/briefing/flugplaetze/pdftripkit.php?icao=";
+            }
+        }
 
         // User Settings -----------------------------------------------------------------------
 

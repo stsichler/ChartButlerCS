@@ -39,7 +39,8 @@ namespace ChartButlerCS
         private void sofortDruckenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListViewItem itm = vwCharts.SelectedItems[0];
-            System.Diagnostics.Process.Start(itm.ImageKey);
+            try { System.Diagnostics.Process.Start(itm.ImageKey); }
+            catch (Exception) { }
         }
 
         private void cmdOK_Click(object sender, EventArgs e)
@@ -62,13 +63,12 @@ namespace ChartButlerCS
 
         private void cmdShowAll_Click(object sender, EventArgs e)
         {
-            foreach (CChart chrt in m_clist)
+            try
             {
-                System.Diagnostics.Process.Start(chrt.GetChartPath());
+                foreach (CChart chrt in m_clist)
+                    System.Diagnostics.Process.Start(chrt.GetChartPath());
             }
+            catch (Exception) { }
         }
-
-       
-
     }
 }

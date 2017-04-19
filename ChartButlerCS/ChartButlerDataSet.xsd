@@ -12,7 +12,7 @@
   <xs:element name="ChartButlerDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="False" msprop:Generator_DataSetName="ChartButlerDataSet" msprop:Generator_UserDSName="ChartButlerDataSet">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="AFCharts" msprop:Generator_TableClassName="AFChartsDataTable" msprop:Generator_TableVarName="tableAFCharts" msprop:Generator_TablePropName="AFCharts" msprop:Generator_RowDeletingName="AFChartsRowDeleting" msprop:Generator_RowChangingName="AFChartsRowChanging" msprop:Generator_RowEvHandlerName="AFChartsRowChangeEventHandler" msprop:Generator_RowDeletedName="AFChartsRowDeleted" msprop:Generator_UserTableName="AFCharts" msprop:Generator_RowChangedName="AFChartsRowChanged" msprop:Generator_RowEvArgName="AFChartsRowChangeEvent" msprop:Generator_RowClassName="AFChartsRow">
+        <xs:element name="AFCharts" msprop:Generator_TableClassName="AFChartsDataTable" msprop:Generator_TableVarName="tableAFCharts" msprop:Generator_RowChangedName="AFChartsRowChanged" msprop:Generator_TablePropName="AFCharts" msprop:Generator_RowDeletingName="AFChartsRowDeleting" msprop:Generator_RowChangingName="AFChartsRowChanging" msprop:Generator_RowEvHandlerName="AFChartsRowChangeEventHandler" msprop:Generator_RowDeletedName="AFChartsRowDeleted" msprop:Generator_RowClassName="AFChartsRow" msprop:Generator_UserTableName="AFCharts" msprop:Generator_RowEvArgName="AFChartsRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ICAO" msprop:Generator_ColumnVarNameInTable="columnICAO" msprop:Generator_ColumnPropNameInRow="ICAO" msprop:Generator_ColumnPropNameInTable="ICAOColumn" msprop:Generator_UserColumnName="ICAO">
@@ -41,7 +41,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Airfields" msprop:Generator_TableClassName="AirfieldsDataTable" msprop:Generator_TableVarName="tableAirfields" msprop:Generator_TablePropName="Airfields" msprop:Generator_RowDeletingName="AirfieldsRowDeleting" msprop:Generator_RowChangingName="AirfieldsRowChanging" msprop:Generator_RowEvHandlerName="AirfieldsRowChangeEventHandler" msprop:Generator_RowDeletedName="AirfieldsRowDeleted" msprop:Generator_UserTableName="Airfields" msprop:Generator_RowChangedName="AirfieldsRowChanged" msprop:Generator_RowEvArgName="AirfieldsRowChangeEvent" msprop:Generator_RowClassName="AirfieldsRow">
+        <xs:element name="Airfields" msprop:Generator_TableClassName="AirfieldsDataTable" msprop:Generator_TableVarName="tableAirfields" msprop:Generator_RowChangedName="AirfieldsRowChanged" msprop:Generator_TablePropName="Airfields" msprop:Generator_RowDeletingName="AirfieldsRowDeleting" msprop:Generator_RowChangingName="AirfieldsRowChanging" msprop:Generator_RowEvHandlerName="AirfieldsRowChangeEventHandler" msprop:Generator_RowDeletedName="AirfieldsRowDeleted" msprop:Generator_RowClassName="AirfieldsRow" msprop:Generator_UserTableName="Airfields" msprop:Generator_RowEvArgName="AirfieldsRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="ICAO" msprop:Generator_ColumnVarNameInTable="columnICAO" msprop:Generator_ColumnPropNameInRow="ICAO" msprop:Generator_ColumnPropNameInTable="ICAOColumn" msprop:Generator_UserColumnName="ICAO">
@@ -62,17 +62,24 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="AIP" msprop:Generator_TableClassName="AIPDataTable" msprop:Generator_TableVarName="tableAIP" msprop:Generator_TablePropName="AIP" msprop:Generator_RowDeletingName="AIPRowDeleting" msprop:Generator_RowChangingName="AIPRowChanging" msprop:Generator_RowEvHandlerName="AIPRowChangeEventHandler" msprop:Generator_RowDeletedName="AIPRowDeleted" msprop:Generator_UserTableName="AIP" msprop:Generator_RowChangedName="AIPRowChanged" msprop:Generator_RowEvArgName="AIPRowChangeEvent" msprop:Generator_RowClassName="AIPRow">
+        <xs:element name="AIP" msprop:Generator_TableClassName="AIPDataTable" msprop:Generator_TableVarName="tableAIP" msprop:Generator_RowChangedName="AIPRowChanged" msprop:Generator_TablePropName="AIP" msprop:Generator_RowDeletingName="AIPRowDeleting" msprop:Generator_RowChangingName="AIPRowChanging" msprop:Generator_RowEvHandlerName="AIPRowChangeEventHandler" msprop:Generator_RowDeletedName="AIPRowDeleted" msprop:Generator_RowClassName="AIPRow" msprop:Generator_UserTableName="AIP" msprop:Generator_RowEvArgName="AIPRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="LastUpdate" msprop:Generator_ColumnVarNameInTable="columnLastUpdate" msprop:Generator_ColumnPropNameInRow="LastUpdate" msprop:Generator_ColumnPropNameInTable="LastUpdateColumn" msprop:Generator_UserColumnName="LastUpdate" type="xs:dateTime" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Updates" msprop:Generator_TableClassName="UpdatesDataTable" msprop:Generator_TableVarName="tableUpdates" msprop:Generator_TablePropName="Updates" msprop:Generator_RowDeletingName="UpdatesRowDeleting" msprop:Generator_RowChangingName="UpdatesRowChanging" msprop:Generator_RowEvHandlerName="UpdatesRowChangeEventHandler" msprop:Generator_RowDeletedName="UpdatesRowDeleted" msprop:Generator_UserTableName="Updates" msprop:Generator_RowChangedName="UpdatesRowChanged" msprop:Generator_RowEvArgName="UpdatesRowChangeEvent" msprop:Generator_RowClassName="UpdatesRow">
+        <xs:element name="Updates" msprop:Generator_TableClassName="UpdatesDataTable" msprop:Generator_TableVarName="tableUpdates" msprop:Generator_RowChangedName="UpdatesRowChanged" msprop:Generator_TablePropName="Updates" msprop:Generator_RowDeletingName="UpdatesRowDeleting" msprop:Generator_RowChangingName="UpdatesRowChanging" msprop:Generator_RowEvHandlerName="UpdatesRowChangeEventHandler" msprop:Generator_RowDeletedName="UpdatesRowDeleted" msprop:Generator_RowClassName="UpdatesRow" msprop:Generator_UserTableName="Updates" msprop:Generator_RowEvArgName="UpdatesRowChangeEvent">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Date" msprop:Generator_ColumnVarNameInTable="columnDate" msprop:Generator_ColumnPropNameInRow="Date" msprop:Generator_ColumnPropNameInTable="DateColumn" msprop:Generator_UserColumnName="Date" type="xs:dateTime" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ChartButler" msprop:Generator_TableClassName="ChartButlerDataTable" msprop:Generator_TableVarName="tableChartButler" msprop:Generator_TablePropName="ChartButler" msprop:Generator_RowDeletingName="ChartButlerRowDeleting" msprop:Generator_RowChangingName="ChartButlerRowChanging" msprop:Generator_RowEvHandlerName="ChartButlerRowChangeEventHandler" msprop:Generator_RowDeletedName="ChartButlerRowDeleted" msprop:Generator_UserTableName="ChartButler" msprop:Generator_RowChangedName="ChartButlerRowChanged" msprop:Generator_RowEvArgName="ChartButlerRowChangeEvent" msprop:Generator_RowClassName="ChartButlerRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Version" msprop:Generator_ColumnVarNameInTable="columnVersion" msprop:Generator_ColumnPropNameInRow="Version" msprop:Generator_ColumnPropNameInTable="VersionColumn" msprop:Generator_UserColumnName="Version" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -93,9 +100,9 @@
   </xs:element>
   <xs:annotation>
     <xs:appinfo>
-      <msdata:Relationship name="Airfields_AFCharts" msdata:parent="Airfields" msdata:child="AFCharts" msdata:parentkey="ICAO" msdata:childkey="ICAO" msprop:Generator_UserChildTable="AFCharts" msprop:Generator_ChildPropName="GetAFChartsRows" msprop:Generator_UserRelationName="Airfields_AFCharts" msprop:Generator_RelationVarName="relationAirfields_AFCharts" msprop:Generator_UserParentTable="Airfields" msprop:Generator_ParentPropName="AirfieldsRow" />
-      <msdata:Relationship name="Updates_Airfields" msdata:parent="Updates" msdata:child="Airfields" msdata:parentkey="Date" msdata:childkey="LastUpdate" msprop:Generator_UserChildTable="Airfields" msprop:Generator_ChildPropName="GetAirfieldsRows" msprop:Generator_UserRelationName="Updates_Airfields" msprop:Generator_RelationVarName="relationUpdates_Airfields" msprop:Generator_UserParentTable="Updates" msprop:Generator_ParentPropName="UpdatesRow" />
-      <msdata:Relationship name="Updates_AFCharts" msdata:parent="Updates" msdata:child="AFCharts" msdata:parentkey="Date" msdata:childkey="LastUpdate" msprop:Generator_UserChildTable="AFCharts" msprop:Generator_ChildPropName="GetAFChartsRows" msprop:Generator_UserRelationName="Updates_AFCharts" msprop:Generator_RelationVarName="relationUpdates_AFCharts" msprop:Generator_UserParentTable="Updates" msprop:Generator_ParentPropName="UpdatesRow" />
+      <msdata:Relationship name="Airfields_AFCharts" msdata:parent="Airfields" msdata:child="AFCharts" msdata:parentkey="ICAO" msdata:childkey="ICAO" msprop:Generator_UserChildTable="AFCharts" msprop:Generator_ChildPropName="GetAFChartsRows" msprop:Generator_UserRelationName="Airfields_AFCharts" msprop:Generator_ParentPropName="AirfieldsRow" msprop:Generator_RelationVarName="relationAirfields_AFCharts" msprop:Generator_UserParentTable="Airfields" />
+      <msdata:Relationship name="Updates_Airfields" msdata:parent="Updates" msdata:child="Airfields" msdata:parentkey="Date" msdata:childkey="LastUpdate" msprop:Generator_UserChildTable="Airfields" msprop:Generator_ChildPropName="GetAirfieldsRows" msprop:Generator_UserRelationName="Updates_Airfields" msprop:Generator_ParentPropName="UpdatesRow" msprop:Generator_RelationVarName="relationUpdates_Airfields" msprop:Generator_UserParentTable="Updates" />
+      <msdata:Relationship name="Updates_AFCharts" msdata:parent="Updates" msdata:child="AFCharts" msdata:parentkey="Date" msdata:childkey="LastUpdate" msprop:Generator_UserChildTable="AFCharts" msprop:Generator_ChildPropName="GetAFChartsRows" msprop:Generator_UserRelationName="Updates_AFCharts" msprop:Generator_ParentPropName="UpdatesRow" msprop:Generator_RelationVarName="relationUpdates_AFCharts" msprop:Generator_UserParentTable="Updates" />
     </xs:appinfo>
   </xs:annotation>
 </xs:schema>

@@ -22,7 +22,7 @@ namespace ChartButlerCS
         private void frmChartDB_Load(object sender, EventArgs e)
         {
             readDataBase();
-
+            updateTreeView();
             updateUpdateRequiredPanel();
 
             if (Settings.Default.ChartFolder.Length == 0 && Settings.Default.ServerUsername.Length == 0
@@ -113,7 +113,8 @@ namespace ChartButlerCS
         {
             if (chartButlerDataSet.Airfields.Count != 0)
             {
-                if (chartButlerDataSet.AIP.Count == 0)
+                if (chartButlerDataSet.AIP.Count == 0 
+                    || chartButlerDataSet.ChartButler.Count == 0 || chartButlerDataSet.ChartButler[0].Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString())
                 {
                     label_Hinweis.Text = "Bitte führen Sie einen Abgleich der Karten mit dem Server durch!";
                     panel_UpdateRequired.Visible = true;
@@ -155,8 +156,9 @@ namespace ChartButlerCS
             TreeNode node = e.Node;
             if (node != null && node.Tag != null && node.Tag.GetType() == typeof(ChartButlerDataSet.AFChartsRow))
             {
-                ChartButlerDataSet.AFChartsRow chrow = (ChartButlerDataSet.AFChartsRow)(node.Tag); 
-                System.Diagnostics.Process.Start(BuildChartPdfPath(chrow));
+                ChartButlerDataSet.AFChartsRow chrow = (ChartButlerDataSet.AFChartsRow)(node.Tag);
+                try { System.Diagnostics.Process.Start(BuildChartPdfPath(chrow)); }
+                catch (Exception) { }
             }
         }
 
@@ -270,9 +272,9 @@ namespace ChartButlerCS
         {
             CServerConnection cConn = new CServerConnection(this,chartButlerDataSet);            
             clist = cConn.Establish(true, null);
-            updateUpdateRequiredPanel();
             updateTreeView(); 
             updateDataBase();
+            updateUpdateRequiredPanel();
             if (clist != null && clist.Count != 0)
             {
                 CUpdateOverview cupov = new CUpdateOverview(clist);
@@ -302,7 +304,10 @@ namespace ChartButlerCS
         {
             frmOptions opts = new frmOptions();
             if (opts.ShowDialog(this) == DialogResult.OK && opts.m_ChartsPathChanged)
+            {
                 readDataBase();
+                updateTreeView();
+            }
             updateUpdateRequiredPanel();
 
             cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
@@ -378,8 +383,6 @@ namespace ChartButlerCS
             }
             else
                 Text = windowTitle;
-
-            updateTreeView();
         }
 
         public void rebuildDataBaseFromChartDir()
@@ -415,9 +418,9 @@ namespace ChartButlerCS
                 MessageBox.Show(this,
                     "Die vorhandenen Kartendaten stammen offenbar aus\n"+
                     "einer älteren ChartButler Version.\n\n"+
-                    "Die Aktualität dieser Karten ist leider unklar, daher\n"+ 
-                    "werden bei der nächsten Karten-Aktualisierung einige\n"+
-                    "oder sogar alle Karten erneut herunter geladen!",
+                    "Damit die Aktualität der Karten überprüft werden kann,\n"+
+                    "werden bei der nächsten Karten-Aktualisierung eventuell\n"+
+                    "einige oder sogar alle Karten erneut herunter geladen!",
                     "ChartButler", MessageBoxButtons.OK);
             }
         }
@@ -428,6 +431,10 @@ namespace ChartButlerCS
         /// </summary>
         public void updateDataBase()
         {
+            if (chartButlerDataSet.ChartButler.Count == 0)
+                chartButlerDataSet.ChartButler.AddChartButlerRow("");
+            chartButlerDataSet.ChartButler[0].Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             if (Settings.Default.ChartFolder.Length > 0 && chartButlerDataSet.AFCharts.Count != 0)
             {
                 string tmpDbPath = Path.GetTempFileName();
