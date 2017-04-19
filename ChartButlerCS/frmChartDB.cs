@@ -332,7 +332,7 @@ namespace ChartButlerCS
         public void readDataBase()
         {
             chartButlerDataSet.Clear();
-            string windowTitle = "ChartButler(C) 2016 Jörg Pauly / Stefan Sichler";
+            string windowTitle = "ChartButler(C) 2017 Jörg Pauly / Stefan Sichler";
 
             if (Settings.Default.ChartFolder.Length > 0)
             {

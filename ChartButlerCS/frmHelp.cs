@@ -13,6 +13,9 @@ namespace ChartButlerCS
         public frmHelp()
         {
             InitializeComponent();
+
+            richTextBox2.Text = "\nChartButler Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\n\n"
+                + richTextBox2.Text;
         }
 
         private void cmdClose_Click(object sender, EventArgs e)
