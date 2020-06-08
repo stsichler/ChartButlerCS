@@ -10,6 +10,6 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 
 - ChartButlerCS ist nun ein Single-File Executable, benötigt daher keine Installation mehr und kann von einem beliebigen Ort - z.B. einem USB-Stick - gestartet werden. Außerdem werden grundsätzlich keine Administrator-Rechte mehr benötigt
 
-- ChartButlerCS läuft nun sowohl auf allen Windows Plattformen (mit .NET 2.0), als auch auf Linux Derivaten mit entsprechend installiertem Mono Framework CLI 2.0 (<code>sudo apt-get install libmono-winforms2.0-cil</code>)
+- ChartButlerCS läuft nun sowohl auf allen Windows Plattformen (ab .NET 4.5), als auch auf Linux Derivaten mit entsprechend installiertem Mono Framework
 
 - Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen  
