@@ -304,9 +304,7 @@ namespace ChartButlerCS
             bool same_chartbutler_version = (chartButlerDataset.ChartButler.Count != 0 
                 && chartButlerDataset.ChartButler[0].Version == System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
-            if (chartButlerDataset.AIP.Count == 0)
-                chartButlerDataset.AIP.AddAIPRow(UpDate);
-            else
+            if (chartButlerDataset.AIP.Count != 0)
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + Environment.NewLine); });
@@ -321,8 +319,6 @@ namespace ChartButlerCS
                     System.Threading.Thread.Sleep(3000);
                     return;
                 }
-
-                chartButlerDataset.AIP[0].LastUpdate = UpDate;
             }
 
             if (full_update_required)
@@ -354,6 +350,11 @@ namespace ChartButlerCS
                 sts.progressBar.PerformStep(); });
 
             UpdateCharts(AFlist);
+
+            if (chartButlerDataset.AIP.Count == 0)
+                chartButlerDataset.AIP.AddAIPRow(UpDate);
+            else
+                chartButlerDataset.AIP[0].LastUpdate = UpDate;
         }
 
        
@@ -541,8 +542,9 @@ namespace ChartButlerCS
                     else
                         sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("wird aktualisiert... "); });
 
+                    DownloadFileFromURL(tmpPdfPath, chartLink.pdfURL);
                     File.Delete(CFullPath);
-                    DownloadFileFromURL(CFullPath, chartLink.pdfURL);
+                    File.Move(tmpPdfPath, CFullPath);
 
                     if (!is_tripkit_chart)
                     {

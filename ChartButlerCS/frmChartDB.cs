@@ -107,6 +107,9 @@ namespace ChartButlerCS
                 }
             }
             treeView1.ResumeLayout();
+
+            cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0
+                && chartButlerDataSet.Airfields.Count > 0;
         }
 
         private void updateUpdateRequiredPanel()
@@ -303,15 +306,15 @@ namespace ChartButlerCS
         private void cmdOptions_Click(object sender, EventArgs e)
         {
             frmOptions opts = new frmOptions();
-            if (opts.ShowDialog(this) == DialogResult.OK && opts.m_ChartsPathChanged)
+            if (opts.ShowDialog(this) == DialogResult.OK)
             {
-                readDataBase();
+                if (opts.m_ChartsPathChanged)
+                    readDataBase();
                 updateTreeView();
             }
             updateUpdateRequiredPanel();
 
             cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
-            cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -326,13 +329,13 @@ namespace ChartButlerCS
         }
 
         /// <summary>
-        /// liest die Datenbank ein. Falls nicht vorhanden, wird sie aus der vorhandenen Verzeichnisstruktur
+        /// liest die Datenbank ein. Falls nicht vorhanden oder fehlerhaft, wird sie aus der vorhandenen Verzeichnisstruktur
         /// wiederhergestellt.
         /// </summary>
         public void readDataBase()
         {
             chartButlerDataSet.Clear();
-            string windowTitle = "ChartButler(C) 2017 Jörg Pauly / Stefan Sichler";
+            string windowTitle = "ChartButler(C) 2020 Jörg Pauly / Stefan Sichler";
 
             if (Settings.Default.ChartFolder.Length > 0)
             {
@@ -435,19 +438,24 @@ namespace ChartButlerCS
                 chartButlerDataSet.ChartButler.AddChartButlerRow("");
             chartButlerDataSet.ChartButler[0].Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            if (Settings.Default.ChartFolder.Length > 0 && chartButlerDataSet.AFCharts.Count != 0)
+            if (Settings.Default.ChartFolder.Length > 0)
             {
-                string tmpDbPath = Path.GetTempFileName();
-                chartButlerDataSet.WriteXml(tmpDbPath);
                 string dbPath = Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml");
-                if (!CServerConnection.FileEquals(tmpDbPath, dbPath))
+                if (chartButlerDataSet.AFCharts.Count != 0)
                 {
-                    File.Delete(dbPath);
-                    File.SetAttributes(tmpDbPath, FileAttributes.Hidden);
-                    File.Move(tmpDbPath, dbPath);
+                    string tmpDbPath = Path.GetTempFileName();
+                    chartButlerDataSet.WriteXml(tmpDbPath);
+                    if (!CServerConnection.FileEquals(tmpDbPath, dbPath))
+                    {
+                        File.Delete(dbPath);
+                        File.SetAttributes(tmpDbPath, FileAttributes.Hidden);
+                        File.Move(tmpDbPath, dbPath);
+                    }
+                    else
+                        File.Delete(tmpDbPath);
                 }
                 else
-                    File.Delete(tmpDbPath);
+                    File.Delete(dbPath);
             }
         }
 
