@@ -101,8 +101,8 @@ namespace ChartButlerCS
                     good= true;
                 else if (
                     MessageBox.Show(
-                    "Das GAT24 Server-Zertifikat konnte nicht verifiziert werden.\n" +
-                    "Möchten Sie dieses Zertifikat trotzdem dauerhaft akzeptieren?\n\n" +
+                    "Das GAT24 Server-Zertifikat konnte nicht verifiziert werden." + Environment.NewLine +
+                    "Möchten Sie dieses Zertifikat trotzdem dauerhaft akzeptieren?" + Environment.NewLine + Environment.NewLine +
                     certificate.ToString(),
                     "Zertifizierungsfehler",
                     MessageBoxButtons.YesNo) == DialogResult.Yes )
@@ -131,7 +131,7 @@ namespace ChartButlerCS
                    }
                    catch (Exception exc)
                    {
-                       errorText = "Entschuldigung. \nEs gab einen unerwarteten Fehler: \n\n" + exc.ToString();
+                       errorText = "Entschuldigung. " + Environment.NewLine + "Es gab einen unerwarteten Fehler: " + Environment.NewLine + Environment.NewLine + exc.ToString();
                    }
                    finally { sts.Invoke((MethodInvoker)delegate { sts.Close(); }); }
                });
@@ -167,6 +167,20 @@ namespace ChartButlerCS
             string resultSet = "";
             try
             {
+                ServicePointManager.SecurityProtocol = 0;
+                foreach (SecurityProtocolType protocol in SecurityProtocolType.GetValues(typeof(SecurityProtocolType)))
+                    {
+                        switch (protocol)
+                        {
+                            case SecurityProtocolType.Ssl3:
+                            case SecurityProtocolType.Tls:
+                            case SecurityProtocolType.Tls11:
+                                break;
+                            default:
+                                ServicePointManager.SecurityProtocol |= protocol;
+                            break;
+                        }
+                    }
                 HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(ChartButlerCS.Settings.Default.ServerURL);
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
@@ -181,19 +195,21 @@ namespace ChartButlerCS
                 wres.Close ();
                 dsread.Close ();
             }
-            catch (Exception) 
+            catch (Exception exc) 
             {
-                errorText = "Entschuldigung. \nDie Verbindung zum GAT24 Server \nkonnte nicht hergestellt werden.";
+                errorText = "Entschuldigung. " + Environment.NewLine + "Die Verbindung zum GAT24 Server " + Environment.NewLine + "konnte nicht hergestellt werden."
+                    + Environment.NewLine + Environment.NewLine + "Technische Details:"+ Environment.NewLine 
+                    + exc.Message+ Environment.NewLine + "Framework Version: " + typeof(HttpWebRequest).Assembly.GetName().Version.ToString();
                 return;
             }
             SID = GetSID(resultSet);
             sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
             if (SID == "0")
             {
-                errorText= "Ihre Sitzung wurde vom GAT24-Server nicht authorisiert!\nBitte überprüfen Sie die Zugangsdaten.";
+                errorText= "Ihre Sitzung wurde vom GAT24-Server nicht authorisiert!" + Environment.NewLine + "Bitte überprüfen Sie die Zugangsdaten.";
                 return;
             }
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK.\n"); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK." + Environment.NewLine); });
             if (m_Upd)
             {
                 CheckForNewCharts();
@@ -206,7 +222,7 @@ namespace ChartButlerCS
                 {
                     newField = newField.ToUpper();
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText("Hole neuen Flugplatz: " + newField + "\n");
+                        sts.txtProgress.AppendText("Hole neuen Flugplatz: " + newField + Environment.NewLine);
                         sts.txtProgress.AppendText("Erzeuge Datenbank-Einträge..."); });
                     ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(newField);
                     if (afrow != null)
@@ -224,7 +240,7 @@ namespace ChartButlerCS
                     chartButlerDataset.Airfields.AddAirfieldsRow(afrow);
 
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText("erledigt!\n");
+                        sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
                         sts.progressBar.PerformStep();
 
                         sts.txtProgress.AppendText("Lade Karten-Liste..." ); });
@@ -237,11 +253,11 @@ namespace ChartButlerCS
                         return;
                     }
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText("erledigt!\n");
+                        sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
 
                         sts.progressBar.Maximum = 3 + LinkList.Count;
                         sts.progressBar.PerformStep();
-                        sts.txtProgress.AppendText("Hole Karten-Dateien ab...\n"); });
+                        sts.txtProgress.AppendText("Hole Karten-Dateien ab..." + Environment.NewLine); });
 
                     bool update_tripkit = true;
                     foreach (ChartLink cl in LinkList)
@@ -251,7 +267,7 @@ namespace ChartButlerCS
                     }
 
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText("erledigt!\n");
+                        sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
                         sts.progressBar.Value = sts.progressBar.Maximum; });
                     System.Threading.Thread.Sleep(3000);
                 }
@@ -282,7 +298,7 @@ namespace ChartButlerCS
             string htmlText = GetURLText(InsertSID(Settings.Default.ServerAmendedURL, SID));
             UpDate = DateTime.Parse(GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:").text);
 
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+"\n"); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+ Environment.NewLine); });
 
             bool full_update_required = true;
             bool same_chartbutler_version = (chartButlerDataset.ChartButler.Count != 0 
@@ -293,14 +309,14 @@ namespace ChartButlerCS
             else
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
-                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + "\n"); });
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + Environment.NewLine); });
                 if ((UpDate - lastUpdate).Days == Settings.Default.UpdateInterval && same_chartbutler_version)
                     full_update_required = false;
 
                 if (UpDate == lastUpdate && same_chartbutler_version)
                 {
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText("\nKeine Aktualisierung notwendig!\n");
+                        sts.txtProgress.AppendText(Environment.NewLine + "Keine Aktualisierung notwendig!" + Environment.NewLine);
                         sts.progressBar.Value = sts.progressBar.Maximum; });
                     System.Threading.Thread.Sleep(3000);
                     return;
@@ -311,7 +327,7 @@ namespace ChartButlerCS
 
             if (full_update_required)
             {
-                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze...\n"); });
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze..." + Environment.NewLine); });
 
                 ChartButlerDataSet.AirfieldsDataTable d = chartButlerDataset.Airfields;
                 for (int j = 0; j < d.Count; ++j)
@@ -319,7 +335,7 @@ namespace ChartButlerCS
             }
             else
             {
-                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe berichtigte Flugplätze...\n"); });
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe berichtigte Flugplätze..." + Environment.NewLine); });
 
                 int i = 0;
                 int lasti = 0;
@@ -347,14 +363,14 @@ namespace ChartButlerCS
         /// <param name="AFlist">Die Liste der amendierten Flugplätze.</param>
         public void UpdateCharts(List<string> AFlist)
         {
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Scanne Airfields...\n"); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Scanne Airfields..." + Environment.NewLine); });
             foreach (string ICAO in AFlist)
             {
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe " + ICAO + "... "); });
                 ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(ICAO);
                 if (afrow != null)
                 {
-                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten...\n"); });
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten..." + Environment.NewLine); });
                     string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + ICAO + "&SID=" + SID;
                     string afresult = GetURLText(AFSite);
                     LinkList = GetChartLinks(afresult);
@@ -371,13 +387,13 @@ namespace ChartButlerCS
                 else
                 {
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText("Nicht abonniert!\n");
+                        sts.txtProgress.AppendText("Nicht abonniert!" + Environment.NewLine);
                         sts.progressBar.Value += 4; });
                 }                                                
             }
             
             sts.Invoke((MethodInvoker)delegate {
-                sts.txtProgress.AppendText("\nAktualisierung beendet.\n");
+                sts.txtProgress.AppendText(Environment.NewLine + "Aktualisierung beendet." + Environment.NewLine);
                 sts.progressBar.Value = sts.progressBar.Maximum; });
             System.Threading.Thread.Sleep(3000);
         }
@@ -515,7 +531,7 @@ namespace ChartButlerCS
                 if (m_Upd && !is_new_chart 
                     && ((is_tripkit_chart && !tripkit_needs_update) || (!is_tripkit_chart && FileEquals(tmpPreviewPath, previewPath))))
                 {
-                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("ist aktuell.\n"); });
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("ist aktuell." + Environment.NewLine); });
                     return false;
                 }
                 else
@@ -555,7 +571,7 @@ namespace ChartButlerCS
                     if (is_new_chart)
                         chartButlerDataset.AFCharts.AddAFChartsRow(chartRow);
 
-                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK.\n"); });
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK." + Environment.NewLine); });
 
                     CChart crt = new CChart();
                     crt.SetChartName(chartRow.Cname);
@@ -666,7 +682,7 @@ namespace ChartButlerCS
                 }
                 Field = buf;
                 FieldIcao = Field;
-                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Platz erkannt: " + Field + "\n"); });
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Platz erkannt: " + Field + Environment.NewLine); });
             }
         }
 

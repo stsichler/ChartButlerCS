@@ -29,10 +29,10 @@ namespace ChartButlerCS
                 && chartButlerDataSet.Airfields.Count == 0)
             {
                 MessageBox.Show(this,
-                    "Willkommen bei ChartButler!\n\n" +
-                    "Zur Benutzung dieser Software wird ein GAT24 Benutzerkonto benötigt.\n\n" +
-                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis \n" +
-                    "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie \n" +
+                    "Willkommen bei ChartButler!" + Environment.NewLine + Environment.NewLine +
+                    "Zur Benutzung dieser Software wird ein GAT24 Benutzerkonto benötigt." + Environment.NewLine + Environment.NewLine +
+                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis " + Environment.NewLine +
+                    "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie " + Environment.NewLine +
                     "Ihre GAT24-Zugangsdaten ein.",
                     "Willkommen");
                 cmdOptions_Click(this, new EventArgs());
@@ -352,10 +352,10 @@ namespace ChartButlerCS
                     {
                         chartButlerDataSet.Clear();
                         MessageBox.Show(this,
-                            "Beim Einlesen der Karten-Datenbank ist ein Fehler aufgetreten.\n\n" +
+                            "Beim Einlesen der Karten-Datenbank ist ein Fehler aufgetreten." + Environment.NewLine + Environment.NewLine +
                             "Es wird versucht, die Datenbank anhand der im Karten-Hauptverzeichnis" +
-                            "gefundenen Karten wiederherzustellen.\n" +
-                            "Bei der nächsten Karten-Aktualisierung werden dann alle Karten\n" +
+                            "gefundenen Karten wiederherzustellen." + Environment.NewLine +
+                            "Bei der nächsten Karten-Aktualisierung werden dann alle Karten" + Environment.NewLine +
                             "auf Aktualität geprüft werden.",
                             "ChartButler", MessageBoxButtons.OK);
                     }
@@ -368,17 +368,17 @@ namespace ChartButlerCS
                     catch (Exception)
                     {
                         MessageBox.Show(this,
-                            "Beim Einlesen des Karten-Hauptverzeichnisses ist ein\n" +
-                            "Fehler aufgetreten.\n\n" +
-                            "Bitte überprüfen Sie die Karten manuell und starten\n" +
+                            "Beim Einlesen des Karten-Hauptverzeichnisses ist ein" + Environment.NewLine +
+                            "Fehler aufgetreten." + Environment.NewLine + Environment.NewLine +
+                            "Bitte überprüfen Sie die Karten manuell und starten" + Environment.NewLine +
                             "Sie ChartButler danach neu!",
                             "ChartButler", MessageBoxButtons.OK);
                     }
                 }
                 else
                     MessageBox.Show(this,
-                        "Das Karten-Hauptverzeichnis konnte nicht gefunden werden!\n\n" +
-                        "Bitte überprüfen Sie den Pfad im \"Optionen\" Dialog.\n",
+                        "Das Karten-Hauptverzeichnis konnte nicht gefunden werden!" + Environment.NewLine + Environment.NewLine +
+                        "Bitte überprüfen Sie den Pfad im \"Optionen\" Dialog." + Environment.NewLine,
                         "ChartButler", MessageBoxButtons.OK);
             }
             else
@@ -416,10 +416,10 @@ namespace ChartButlerCS
             if (l_update_needed)
             {
                 MessageBox.Show(this,
-                    "Die vorhandenen Kartendaten stammen offenbar aus\n"+
-                    "einer älteren ChartButler Version.\n\n"+
-                    "Damit die Aktualität der Karten überprüft werden kann,\n"+
-                    "werden bei der nächsten Karten-Aktualisierung eventuell\n"+
+                    "Die vorhandenen Kartendaten stammen offenbar aus"+ Environment.NewLine +
+                    "einer älteren ChartButler Version." + Environment.NewLine + Environment.NewLine +
+                    "Damit die Aktualität der Karten überprüft werden kann," + Environment.NewLine +
+                    "werden bei der nächsten Karten-Aktualisierung eventuell" + Environment.NewLine +
                     "einige oder sogar alle Karten erneut herunter geladen!",
                     "ChartButler", MessageBoxButtons.OK);
             }

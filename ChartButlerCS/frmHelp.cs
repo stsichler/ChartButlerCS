@@ -14,7 +14,8 @@ namespace ChartButlerCS
         {
             InitializeComponent();
 
-            richTextBox2.Text = "\nChartButler Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "\n\n"
+            richTextBox2.Text = Environment.NewLine + "ChartButler Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() 
+                + Environment.NewLine + Environment.NewLine
                 + richTextBox2.Text;
         }
 
