@@ -76,7 +76,9 @@ namespace ChartButlerCS
                         chartNode.Tag = chartrow;
                         chartNode.ContextMenuStrip = contextMenuStrip1;
                     }
+                    chartsBindingSource.Dispose();
                 }
+                airfieldsBindingSource.Dispose();
                 airfieldsNode.Expand();
             }
 
@@ -104,6 +106,7 @@ namespace ChartButlerCS
                     }
                     if (updNode.Nodes.Count != 0) 
                         updatesNode.Nodes.Add(updNode);
+                    chartsBindingSource.Dispose();
                 }
             }
             treeView1.ResumeLayout();
@@ -160,14 +163,25 @@ namespace ChartButlerCS
             if (node != null && node.Tag != null && node.Tag.GetType() == typeof(ChartButlerDataSet.AFChartsRow))
             {
                 ChartButlerDataSet.AFChartsRow chrow = (ChartButlerDataSet.AFChartsRow)(node.Tag);
-                try { System.Diagnostics.Process.Start(BuildChartPdfPath(chrow)); }
+                try { OpenFileInDefaultApp(BuildChartPdfPath(chrow)); }
                 catch (Exception) { }
+            }
+        }
+
+        private void treeView1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == '\r')
+            {
+                treeView1_NodeMouseDoubleClick(null,
+                    new TreeNodeMouseClickEventArgs(treeView1.SelectedNode,MouseButtons.Left,2,0,0));
+                e.Handled = true;
             }
         }
 
         private void previewPictureBox_DoubleClick(object sender, EventArgs e)
         {
-            treeView1_NodeMouseDoubleClick(null,new TreeNodeMouseClickEventArgs(treeView1.SelectedNode,MouseButtons.Left,2,0,0));
+            treeView1_NodeMouseDoubleClick(null,
+                new TreeNodeMouseClickEventArgs(treeView1.SelectedNode,MouseButtons.Left,2,0,0));
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
@@ -319,7 +333,8 @@ namespace ChartButlerCS
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start("http://www.gat24.de");
+            try { OpenFileInDefaultApp("http://www.gat24.de"); }
+            catch (Exception) {}
         }
 
         private void cmdHelp_Click(object sender, EventArgs e)
@@ -497,5 +512,21 @@ namespace ChartButlerCS
             return Path.Combine(Path.Combine(Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), "." + chartRow.Cname + "_preview.jpg");
         }
 
+        public static void OpenFileInDefaultApp(string path)
+        {
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Unix:
+                    System.Diagnostics.Process.Start("xdg-open", "\"" + path + "\"");
+                    break;
+                case PlatformID.MacOSX:
+                    System.Diagnostics.Process.Start("open", "\"" + path + "\"");
+                    break;
+                case PlatformID.Win32NT:
+                default:
+                    System.Diagnostics.Process.Start(path);
+                    break;
+            }
+        }
     }//END CLASS
 }//END NAMESPACE

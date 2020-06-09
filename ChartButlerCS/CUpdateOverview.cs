@@ -39,7 +39,7 @@ namespace ChartButlerCS
         private void sofortDruckenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListViewItem itm = vwCharts.SelectedItems[0];
-            try { System.Diagnostics.Process.Start(itm.ImageKey); }
+            try { frmChartDB.OpenFileInDefaultApp(itm.ImageKey); }
             catch (Exception) { }
         }
 
@@ -66,7 +66,7 @@ namespace ChartButlerCS
             try
             {
                 foreach (CChart chrt in m_clist)
-                    System.Diagnostics.Process.Start(chrt.GetChartPath());
+                    frmChartDB.OpenFileInDefaultApp(chrt.GetChartPath());
             }
             catch (Exception) { }
         }
