@@ -1,7 +1,5 @@
-.svn
-Repository
 /ChartButlerCS/bin
 /ChartButlerCS/obj
 /ChartButlerCS/ChartButlerCS.userprefs
-/ChartButlerCS/.vs/ChartButlerCS/v14/*.suo
-/ChartButlerCS/Properties/Resources.resources
+/ChartButlerCS/.vs
+/ChartButlerCS/.vscode
