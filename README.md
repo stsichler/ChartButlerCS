@@ -21,8 +21,8 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 
 - Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen  
 
-
-### Dieses Programm ist frei erhältlich.
+---
+**Dieses Programm ist frei erhältlich.**
 
 Kartenmaterial von [EuroGAT24 GmbH, Zweibrücken](https://www.gat24.de/).
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
@@ -31,4 +31,4 @@ Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
 
 
 Fehler, Kritik, Anregungen und Wünsche bitte per Mail an:
-mailto:stefan.sichler@gmx.de
+<a href="mailto:stefan.sichler@gmx.de?subject=ChartButlerCS">stefan.sichler@gmx.de</a>
