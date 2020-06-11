@@ -114,6 +114,7 @@
             this.richTextBox2.Size = new System.Drawing.Size(570, 487);
             this.richTextBox2.TabIndex = 0;
             this.richTextBox2.Text = resources.GetString("richTextBox2.Text");
+            this.richTextBox2.LinkClicked += new System.Windows.Forms.LinkClickedEventHandler(this.richTextBox2_LinkClicked);
             // 
             // cmdClose
             // 

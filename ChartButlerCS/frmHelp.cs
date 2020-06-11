@@ -14,8 +14,8 @@ namespace ChartButlerCS
         {
             InitializeComponent();
 
-            richTextBox2.Text = Environment.NewLine + "ChartButler Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() 
-                + Environment.NewLine + Environment.NewLine
+            richTextBox2.Text = Environment.NewLine + "ChartButlerCS Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() 
+                + Environment.NewLine
                 + richTextBox2.Text;
         }
 
@@ -24,6 +24,11 @@ namespace ChartButlerCS
             this.Close();
         }
 
+        private void richTextBox2_LinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            try { frmChartDB.OpenFileInDefaultApp(e.LinkText); }
+            catch (Exception) {}
+        }
   
     }
 }

@@ -149,6 +149,9 @@ ChartButler speichert seine Karten-Datenbank neben den Karten selbst als verstec
   </data>
   <data name="richTextBox2.Text" xml:space="preserve">
     <value>
+https://stsichler.github.io/ChartButlerCS/
+
+
 Idee und Originalversion (C) 2010 Jörg Pauly
 
 (Diese) vollständig überarbeitete Version (C) 2016 Stefan Sichler
@@ -157,7 +160,7 @@ alle Rechte vorbehalten!
 
 Dieses Programm ist frei erhältlich und ist für alle Kunden von GAT24.de lizenziert.
 
-Kartenmaterial von EuroGAT24 GmbH, Zweibrücken.
+Kartenmaterial von EuroGAT24 GmbH, Zweibrücken, https://www.gat24.de
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
 
 Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
