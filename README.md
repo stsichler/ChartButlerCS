@@ -2,7 +2,7 @@
 
 [**> Aktuelle Version hier herunterladen <**](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
-[![Github All Releases](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/total?style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
+[![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/total?style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
 ![Screenshot](https://github.com/stsichler/ChartButlerCS/raw/master/Screenshot.png)
 
@@ -19,7 +19,7 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 - Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen  
 
 
-## Dieses Programm ist frei erhältlich.
+### Dieses Programm ist frei erhältlich.
 
 Kartenmaterial von [EuroGAT24 GmbH, Zweibrücken](https://www.gat24.de/).
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
