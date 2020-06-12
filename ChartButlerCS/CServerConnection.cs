@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Reflection;
 using System.Net;
 using System.Windows.Forms;
 using System.Security.Cryptography.X509Certificates;
@@ -197,9 +198,15 @@ namespace ChartButlerCS
             }
             catch (Exception exc) 
             {
+                string assemblyVersion = typeof(HttpWebRequest).Assembly.GetName().Version.ToString();
+                // try to find of exact file version of System Assembly
+                object[] ver = typeof(HttpWebRequest).Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
+                if (ver.Length > 0)
+                    assemblyVersion = ((AssemblyFileVersionAttribute)ver[0]).Version;
+
                 errorText = "Entschuldigung. " + Environment.NewLine + "Die Verbindung zum GAT24 Server " + Environment.NewLine + "konnte nicht hergestellt werden."
                     + Environment.NewLine + Environment.NewLine + "Technische Details:"+ Environment.NewLine 
-                    + exc.Message+ Environment.NewLine + "Framework Version: " + typeof(HttpWebRequest).Assembly.GetName().Version.ToString();
+                    + exc.Message+ Environment.NewLine + "Framework Version: " + assemblyVersion;
                 return;
             }
             SID = GetSID(resultSet);
