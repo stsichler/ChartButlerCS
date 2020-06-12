@@ -4,6 +4,8 @@
 
 [![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/total?style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
+**Systemvoraussetzungen:** Windows, Linux, macOS mit [Mono Framework](https://www.mono-project.com/) oder Windows mit [.NET Framework, ab 4.5](https://dotnet.microsoft.com/download/dotnet-framework)
+
 <sup>[Unterschiede zur Vorgängerversion auf GitHub nachlesen](https://github.com/stsichler/ChartButlerCS/releases/latest)</sup>
 
 
@@ -16,8 +18,6 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 - Der Aktualisierungsmechanismus wurde vollständig überarbeitet. Anflugkarten werden nun auch dann noch korrekt aktualisiert, wenn ein oder mehrere AIRAC Cycles übersprungen wurden
 
 - ChartButlerCS ist nun ein Single-File Executable, benötigt daher keine Installation mehr und kann von einem beliebigen Ort - z.B. einem USB-Stick - gestartet werden. Außerdem werden grundsätzlich keine Administrator-Rechte mehr benötigt
-
-- ChartButlerCS läuft nun sowohl auf allen Windows Plattformen (ab .NET 4.5), als auch auf Linux Derivaten mit entsprechend installiertem [Mono Framework](https://www.mono-project.com/) (und ggf. auch auf MacOS X)
 
 - Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen  
 
