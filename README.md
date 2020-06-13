@@ -25,6 +25,22 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 ---
 **Dieses Programm ist frei erhältlich.**
 
+Haftungsausschluss: 
+
+**Bitte beachten Sie, dass Sie als Pilot für die Aktualität
+der verwendeten AIP-Charts selbst verantwortlich sind.**
+
+ChartButlerCS kann Ihnen dabei nur als **Hilfe** dienen! 
+Es handelt sich um keine offiziell zugelassene Software 
+zur Verwaltung von AIP-Charts.
+
+Diese Software wurde zwar mit größter Sorgfalt und bestem 
+Gewissen programmiert, dennoch sind Fehlfunktionen 
+grundsätzlich nicht auszuschließen.
+Der Autor dieser Software haftet nicht für Schäden, 
+die hieraus entstehen. 
+
+---
 Kartenmaterial von [EuroGAT24 GmbH](https://www.gat24.de/).
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
 
