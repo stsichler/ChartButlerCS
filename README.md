@@ -8,7 +8,7 @@
 
 **Systemvoraussetzungen:** Windows 7 SP1 oder höher mit [.NET Framework 4.5 oder höher](https://dotnet.microsoft.com/download/dotnet-framework) oder Linux oder macOS mit aktuellem [Mono Framework](https://www.mono-project.com/)
 
-**Es wird ein Konto bei [GAT24.de](https://www.gat24.de/) benötigt!**
+**Zur Benutzung dieser Software wird ein [GAT24.de](https://www.gat24.de/) Benutzerkonto benötigt!**
 
 ![Screenshot](https://github.com/stsichler/ChartButlerCS/raw/master/Screenshot.png)
 
@@ -25,20 +25,14 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 ---
 **Dieses Programm ist frei erhältlich.**
 
-Haftungsausschluss: 
+Rechtlicher Hinweis:
 
-**Bitte beachten Sie, dass Sie als Pilot für die Aktualität
-der verwendeten AIP-Charts selbst verantwortlich sind.**
+**Bitte beachten Sie, dass Sie als Pilot für die Aktualität der verwendeten AIP-Charts selbst verantwortlich sind.**
 
-ChartButlerCS kann Ihnen dabei nur als **Hilfe** dienen! 
-Es handelt sich um keine offiziell zugelassene Software 
-zur Verwaltung von AIP-Charts.
+ChartButlerCS kann Ihnen dabei nur als **Hilfe** dienen! Es handelt sich um keine offiziell zugelassene Software zur Verwaltung von AIP-Charts.
 
-Diese Software wurde zwar mit größter Sorgfalt und bestem 
-Gewissen programmiert, dennoch sind Fehlfunktionen 
-grundsätzlich nicht auszuschließen.
-Der Autor dieser Software haftet nicht für Schäden, 
-die hieraus entstehen. 
+Diese Software wurde zwar mit größter Sorgfalt und bestem Gewissen programmiert, dennoch sind Fehlfunktionen grundsätzlich nicht auszuschließen.
+Der Autor dieser Software haftet nicht für Schäden, die hieraus entstehen. 
 
 ---
 Kartenmaterial von [EuroGAT24 GmbH](https://www.gat24.de/).

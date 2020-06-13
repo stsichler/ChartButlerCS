@@ -49,6 +49,7 @@ namespace ChartButlerCS
             userSettings.Add("ChartFolder", "");
             userSettings.Add("ServerUsername", "");
             userSettings.Add("ServerPassword", null);
+            userSettings.Add("EulaRead", "");
         }
 
         public void Reload()
@@ -234,6 +235,17 @@ namespace ChartButlerCS
                             s_aditionalEntropy,DataProtectionScope.CurrentUser));
                 else
                     this["ServerPassword"] = null;
+            }
+        }
+        public string EulaRead
+        {
+            get
+            {
+                return ((string)(this["EulaRead"]));
+            }
+            set
+            {
+                this["EulaRead"] = value;
             }
         }
 

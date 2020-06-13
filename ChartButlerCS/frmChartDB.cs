@@ -25,18 +25,70 @@ namespace ChartButlerCS
             updateTreeView();
             updateUpdateRequiredPanel();
 
-            if (Settings.Default.ChartFolder.Length == 0 && Settings.Default.ServerUsername.Length == 0
+            bool showMsgBox = false;
+            bool showEula = false;
+            bool showOptions = false;
+
+            string text = "";
+
+            const string eulaVersion = "v1"; // rechtlicher Hinweis in Version v1
+            if (Settings.Default.EulaRead != eulaVersion)
+            {
+                showMsgBox = true;
+                showEula = true;
+                text +=
+                    "Rechtlicher Hinweis:" + Environment.NewLine +
+                    "Bitte beachten Sie, dass Sie als Pilot für die Aktualität der verwendeten " +
+                    "AIP-Charts selbst verantwortlich sind." + Environment.NewLine +
+                    Environment.NewLine +
+                    "ChartButlerCS kann Ihnen dabei nur als Hilfe dienen! Es handelt sich um " +
+                    "keine offiziell zugelassene Software zur Verwaltung von AIP-Charts." + Environment.NewLine +
+                    Environment.NewLine +
+                    "Diese Software wurde zwar mit größter Sorgfalt und bestem Gewissen " +
+                    "programmiert, dennoch sind Fehlfunktionen grundsätzlich nicht auszuschließen." + Environment.NewLine +
+                    "Der Autor dieser Software haftet nicht für Schäden, die hieraus entstehen." + Environment.NewLine +
+                    Environment.NewLine;
+            }
+
+            if (Settings.Default.ChartFolder.Length == 0 && Settings.Default.ServerUsername.Length == 0 
                 && chartButlerDataSet.Airfields.Count == 0)
             {
-                MessageBox.Show(this,
-                    "Willkommen bei ChartButler!" + Environment.NewLine + Environment.NewLine +
-                    "Zur Benutzung dieser Software wird ein GAT24 Benutzerkonto benötigt." + Environment.NewLine + Environment.NewLine +
-                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis " + Environment.NewLine +
-                    "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie " + Environment.NewLine +
-                    "Ihre GAT24-Zugangsdaten ein.",
-                    "Willkommen");
-                cmdOptions_Click(this, new EventArgs());
+                showMsgBox = true;
+                showOptions = true;
+                text += 
+                    "Zur Benutzung dieser Software wird ein GAT24 Benutzerkonto benötigt." + Environment.NewLine +
+                    Environment.NewLine +
+                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis " +
+                    "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie " +
+                    "Ihre GAT24-Zugangsdaten ein." + Environment.NewLine;
+                }
+
+            if (showMsgBox)
+            {
+                if (DialogResult.OK != MessageBox.Show(this, text, "Willkommen bei ChartButler!",
+                    showEula ? MessageBoxButtons.OKCancel : MessageBoxButtons.OK,
+                    showEula ? MessageBoxIcon.Exclamation : MessageBoxIcon.None, MessageBoxDefaultButton.Button2))
+                {
+                    this.Close();
+                    return;
+                }
             }
+
+            if (showEula)
+            {
+                try
+                {
+                    Settings.Default.EulaRead = eulaVersion;
+                    Settings.Default.Save();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show(Parent, "Die Einstellungen konnten nicht gespeichert werden!", "ChartButler");
+                }
+            }
+
+            if (showOptions)
+                cmdOptions_Click(this, new EventArgs());
         }
 
         private void frmChartDB_FormClosing(object sender, FormClosingEventArgs e)
