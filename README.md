@@ -4,10 +4,11 @@
 
 [![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/total?style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
-**Systemvoraussetzungen:** Windows, Linux, macOS mit [Mono Framework](https://www.mono-project.com/) oder Windows mit [.NET Framework, ab 4.5](https://dotnet.microsoft.com/download/dotnet-framework)
-
 <sup>[Unterschiede zur Vorgängerversion auf GitHub nachlesen](https://github.com/stsichler/ChartButlerCS/releases/latest)</sup>
 
+**Systemvoraussetzungen:** Windows 7 SP1 oder höher mit [.NET Framework 4.5 oder höher](https://dotnet.microsoft.com/download/dotnet-framework) oder Linux oder macOS mit aktuellem [Mono Framework](https://www.mono-project.com/)
+
+**Es wird ein Konto bei [GAT24.de](https://www.gat24.de/) benötigt!**
 
 ![Screenshot](https://github.com/stsichler/ChartButlerCS/raw/master/Screenshot.png)
 
