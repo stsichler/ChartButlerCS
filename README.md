@@ -4,7 +4,7 @@
 
 [![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/total?style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
-<sup>[Unterschiede zur Vorgängerversion auf GitHub nachlesen](https://github.com/stsichler/ChartButlerCS/releases/latest)</sup>
+<sup>[Unterschiede zur Vorgängerversion auf GitHub nachlesen](https://github.com/stsichler/ChartButlerCS/releases)</sup>
 
 ---
 Rechtlicher Hinweis: 
