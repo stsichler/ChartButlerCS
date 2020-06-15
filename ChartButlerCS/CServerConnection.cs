@@ -74,12 +74,6 @@ namespace ChartButlerCS
             this.chartButlerDataset = chartButlerDataSet;
         }
 
-        static CServerConnection()
-        {
-            // ignore SSL certificate errors
-            ServicePointManager.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
-        }
-
         private static bool ServerCertificateValidationCallback(object sender, 
             X509Certificate certificate,
             X509Chain chain,
@@ -168,21 +162,8 @@ namespace ChartButlerCS
             string resultSet = "";
             try
             {
-                ServicePointManager.SecurityProtocol = 0;
-                foreach (SecurityProtocolType protocol in SecurityProtocolType.GetValues(typeof(SecurityProtocolType)))
-                    {
-                        switch (protocol)
-                        {
-                            case SecurityProtocolType.Ssl3:
-                            case SecurityProtocolType.Tls:
-                            case SecurityProtocolType.Tls11:
-                                break;
-                            default:
-                                ServicePointManager.SecurityProtocol |= protocol;
-                            break;
-                        }
-                    }
                 HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(ChartButlerCS.Settings.Default.ServerURL);
+                request.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
                 request.ContentLength = parByte.Length;
@@ -606,6 +587,7 @@ namespace ChartButlerCS
         private string GetURLText(string URL)
         {            
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(URL);
+            request.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
             request.Method = "GET";
             request.ContentType = "text/html;charset=iso-8859-1";
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();

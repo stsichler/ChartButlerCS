@@ -5,6 +5,10 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.Remoting.Contexts;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Web.Script.Serialization;
 
 namespace ChartButlerCS
 {
@@ -12,11 +16,30 @@ namespace ChartButlerCS
     public partial class frmChartDB : Form
     {
         private List<CChart> clist = new List<CChart>();
+        private bool newReleaseAvailable = false;
+
         public frmChartDB()
         {
             InitializeComponent();
             cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
             cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
+
+            // Alle SSL/TLS Protokolle außer TLS1.2 und höher global deaktivieren
+
+            ServicePointManager.SecurityProtocol = 0;
+            foreach (SecurityProtocolType protocol in SecurityProtocolType.GetValues(typeof(SecurityProtocolType)))
+            {
+                switch (protocol)
+                {
+                    case SecurityProtocolType.Ssl3:
+                    case SecurityProtocolType.Tls:
+                    case SecurityProtocolType.Tls11:
+                        break;
+                    default:
+                        ServicePointManager.SecurityProtocol |= protocol;
+                        break;
+                }
+            }
         }
 
         private void frmChartDB_Load(object sender, EventArgs e)
@@ -89,12 +112,20 @@ namespace ChartButlerCS
 
             if (showOptions)
                 cmdOptions_Click(this, new EventArgs());
+
+            beginCheckForLatestRelease();
         }
 
         private void frmChartDB_FormClosing(object sender, FormClosingEventArgs e)
         // Diese Methode ist eigentlich nicht nötig, verhindert aber einen Crash beim Beenden in Mono
         {
             contextMenuStrip1.SuspendLayout();
+            try
+            {
+                if (checkLatestReleaseWebRequest != null)
+                    checkLatestReleaseWebRequest.Abort();
+            }
+            catch (Exception) { }
         }
 
         private void updateTreeView()
@@ -174,8 +205,9 @@ namespace ChartButlerCS
                 if (chartButlerDataSet.AIP.Count == 0 
                     || chartButlerDataSet.ChartButler.Count == 0 || chartButlerDataSet.ChartButler[0].Version != System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString())
                 {
-                    label_Hinweis.Text = "Bitte führen Sie einen Abgleich der Karten mit dem Server durch!";
-                    panel_UpdateRequired.Visible = true;
+                    label_updateRequired.Text = "Bitte führen Sie einen Abgleich der Karten mit dem Server durch!";
+                    panel_updateRequired.BackColor = Color.DarkRed;
+                    panel_updateRequired.Visible = true;
                 }
                 else
                 {
@@ -184,17 +216,41 @@ namespace ChartButlerCS
 
                     if (age >= Settings.Default.UpdateInterval)
                     {
-                        label_Hinweis.Text = "Die Karten wurden zuletzt vor "+age+" Tagen mit dem Server abgeglichen und sollten daher aktualisiert werden!";
-                        panel_UpdateRequired.Visible = true;
+                        label_updateRequired.Text = "Die Karten wurden zuletzt vor " + age + " Tagen mit dem Server abgeglichen und sollten daher aktualisiert werden!";
+                        panel_updateRequired.BackColor = Color.DarkRed;
+                        panel_updateRequired.Visible = true;
                     }
                     else
-                        panel_UpdateRequired.Visible = false;
+                        panel_updateRequired.Visible = false;
                 }
             }
             else
-                panel_UpdateRequired.Visible = false;
+                panel_updateRequired.Visible = false;
+
+            if (!panel_updateRequired.Visible && newReleaseAvailable)
+            {
+                label_updateRequired.Text = "Eine neue Version von ChartButler steht zur Verfügung! Klicken Sie hier, um zur Webseite zu gelangen.";
+                panel_updateRequired.BackColor = Color.SteelBlue;
+                panel_updateRequired.Visible = true;
+            }
 
             PerformLayout();
+        }
+
+        private void label_updateRequired_Click(object sender, EventArgs e)
+        {
+            if (panel_updateRequired.Visible)
+            {
+                if (panel_updateRequired.BackColor == Color.DarkRed)
+                {
+                    cmdUpdateCharts_Click(this, new EventArgs());
+                }
+                else if (panel_updateRequired.BackColor == Color.SteelBlue)
+                {
+                    try { OpenFileInDefaultApp("https://stsichler.github.io/ChartButlerCS/"); }
+                    catch (Exception) { }
+                }
+            }
         }
 
         private void cmdClose_Click(object sender, EventArgs e)
@@ -580,5 +636,63 @@ namespace ChartButlerCS
                     break;
             }
         }
+
+        private HttpWebRequest checkLatestReleaseWebRequest = null;
+        private void beginCheckForLatestRelease()
+        {
+            try
+            {
+                checkLatestReleaseWebRequest = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/stsichler/ChartButlerCS/releases/latest");
+                checkLatestReleaseWebRequest.ServerCertificateValidationCallback += (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; };
+                checkLatestReleaseWebRequest.Method = "GET";
+                checkLatestReleaseWebRequest.Accept = "application/vnd.github.v3+json";
+                checkLatestReleaseWebRequest.ContentType = "application/json;charset=utf-8";
+                checkLatestReleaseWebRequest.UserAgent = "ChartButlerCS";
+                checkLatestReleaseWebRequest.BeginGetResponse(new AsyncCallback(finishedCheckForLatestRelease), checkLatestReleaseWebRequest);
+            }
+            catch (Exception) { checkLatestReleaseWebRequest = null; }
+        }
+
+        private void finishedCheckForLatestRelease(IAsyncResult result)
+        {
+            string latestReleaseTag = "";
+
+            HttpWebResponse response = null;
+            Stream dataStream = null;
+            StreamReader streamReader = null;
+            try
+            {
+                response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    dataStream = response.GetResponseStream();
+                    streamReader = new StreamReader(dataStream);
+                    string responseFromServer = streamReader.ReadToEnd();
+                    JavaScriptSerializer serializer = new JavaScriptSerializer();
+                    Dictionary<string, object> entries = serializer.Deserialize<Dictionary<string, object>>(responseFromServer);
+                    latestReleaseTag = entries["tag_name"] as string;
+                }
+            }
+            catch (Exception) {}
+            finally
+            {
+                if (streamReader != null)
+                    streamReader.Dispose();
+                if (dataStream != null)
+                    dataStream.Dispose();
+                if (response != null)
+                    response.Dispose();
+            }
+
+            if (latestReleaseTag != "" && latestReleaseTag != ("v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
+            {
+                Invoke((MethodInvoker)delegate {
+                    newReleaseAvailable = true;
+                    updateUpdateRequiredPanel();
+                });
+
+            }
+        }
+
     }//END CLASS
 }//END NAMESPACE

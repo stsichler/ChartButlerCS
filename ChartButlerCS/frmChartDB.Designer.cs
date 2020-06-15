@@ -45,11 +45,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.panel_UpdateRequired = new System.Windows.Forms.Panel();
-            this.label_Hinweis = new System.Windows.Forms.Label();
+            this.panel_updateRequired = new System.Windows.Forms.Panel();
+            this.label_updateRequired = new System.Windows.Forms.Label();
             this.panel4 = new System.Windows.Forms.Panel();
             this.chartButlerDataSet = new ChartButlerCS.ChartButlerDataSet();
             this.contextMenuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
@@ -57,7 +58,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
-            this.panel_UpdateRequired.SuspendLayout();
+            this.panel_updateRequired.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartButlerDataSet)).BeginInit();
             this.SuspendLayout();
@@ -226,28 +227,30 @@
             this.panel2.Size = new System.Drawing.Size(474, 431);
             this.panel2.TabIndex = 0;
             // 
-            // panel_UpdateRequired
+            // panel_updateRequired
             // 
-            this.panel_UpdateRequired.BackColor = System.Drawing.Color.DarkRed;
-            this.panel_UpdateRequired.Controls.Add(this.label_Hinweis);
-            this.panel_UpdateRequired.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel_UpdateRequired.ForeColor = System.Drawing.Color.White;
-            this.panel_UpdateRequired.Location = new System.Drawing.Point(0, 0);
-            this.panel_UpdateRequired.Name = "panel_UpdateRequired";
-            this.panel_UpdateRequired.Size = new System.Drawing.Size(704, 30);
-            this.panel_UpdateRequired.TabIndex = 2;
-            this.panel_UpdateRequired.Visible = false;
+            this.panel_updateRequired.BackColor = System.Drawing.Color.DarkRed;
+            this.panel_updateRequired.Controls.Add(this.label_updateRequired);
+            this.panel_updateRequired.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel_updateRequired.ForeColor = System.Drawing.Color.White;
+            this.panel_updateRequired.Location = new System.Drawing.Point(0, 0);
+            this.panel_updateRequired.Name = "panel_updateRequired";
+            this.panel_updateRequired.Size = new System.Drawing.Size(704, 30);
+            this.panel_updateRequired.TabIndex = 2;
+            this.panel_updateRequired.Visible = false;
             // 
-            // label_Hinweis
+            // label_updateRequired
             // 
-            this.label_Hinweis.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.label_Hinweis.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_Hinweis.Location = new System.Drawing.Point(12, 9);
-            this.label_Hinweis.Name = "label_Hinweis";
-            this.label_Hinweis.Size = new System.Drawing.Size(680, 13);
-            this.label_Hinweis.TabIndex = 0;
-            this.label_Hinweis.Text = "(Hinweis)";
-            this.label_Hinweis.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label_updateRequired.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.label_updateRequired.BackColor = System.Drawing.Color.Transparent;
+            this.label_updateRequired.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_updateRequired.Location = new System.Drawing.Point(12, 9);
+            this.label_updateRequired.Name = "label_updateRequired";
+            this.label_updateRequired.Size = new System.Drawing.Size(680, 13);
+            this.label_updateRequired.TabIndex = 0;
+            this.label_updateRequired.Text = "(Hinweis)";
+            this.label_updateRequired.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label_updateRequired.Click += new System.EventHandler(this.label_updateRequired_Click);
             // 
             // panel4
             // 
@@ -270,7 +273,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(704, 461);
             this.Controls.Add(this.panel4);
-            this.Controls.Add(this.panel_UpdateRequired);
+            this.Controls.Add(this.panel_updateRequired);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(720, 500);
             this.Name = "frmChartDB";
@@ -279,13 +282,14 @@
             this.contextMenuStrip1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.previewPictureBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
-            this.panel_UpdateRequired.ResumeLayout(false);
+            this.panel_updateRequired.ResumeLayout(false);
             this.panel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chartButlerDataSet)).EndInit();
             this.ResumeLayout(false);
@@ -310,8 +314,8 @@
         private System.Windows.Forms.PictureBox previewPictureBox;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel_UpdateRequired;
-        private System.Windows.Forms.Label label_Hinweis;
+        private System.Windows.Forms.Panel panel_updateRequired;
+        private System.Windows.Forms.Label label_updateRequired;
         private System.Windows.Forms.Panel panel4;
     }
 }
