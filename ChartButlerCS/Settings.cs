@@ -182,6 +182,13 @@ namespace ChartButlerCS
             }
         }
 
+        public string ChartButlerURL
+        {
+            get
+            {
+                return "https://stsichler.github.io/ChartButlerCS/";
+            }
+        }
         // User Settings -----------------------------------------------------------------------
 
 

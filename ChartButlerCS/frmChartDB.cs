@@ -247,7 +247,7 @@ namespace ChartButlerCS
                 }
                 else if (panel_updateRequired.BackColor == Color.SteelBlue)
                 {
-                    try { OpenFileInDefaultApp("https://stsichler.github.io/ChartButlerCS/"); }
+                    try { OpenFileInDefaultApp(Settings.Default.ChartButlerURL); }
                     catch (Exception) { }
                 }
             }
