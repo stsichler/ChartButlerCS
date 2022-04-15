@@ -117,7 +117,7 @@ namespace ChartButlerCS
         {
             m_Upd = pUpdate;
             sts.CreateControl();
-			IntPtr dummy = sts.Handle;
+			IntPtr dummy = sts.Handle; // sicherstellen, dass das Fensterhande vor Threadbeginn existiert
             Thread worker = new Thread(() =>
                {
                    try
@@ -128,20 +128,25 @@ namespace ChartButlerCS
                    {
                        errorText = "Entschuldigung. " + Environment.NewLine + "Es gab einen unerwarteten Fehler: " + Environment.NewLine + Environment.NewLine + exc.ToString();
                    }
-                   finally { sts.Invoke((MethodInvoker)delegate { sts.Close(); }); }
+                   if (errorText != null)
+                   {
+                       sts.Invoke((MethodInvoker)delegate
+                       {
+                           sts.txtProgress.AppendText("FEHLER! (siehe separates Fenster)" + Environment.NewLine);
+                       });
+                       MessageBox.Show(parent, errorText, "Fehler");
+                   }
+                   sts.Invoke((MethodInvoker)delegate { sts.Close(); });
                });
             worker.Start();
             sts.ShowDialog();
             worker.Join ();
-            if (errorText != null)
-                MessageBox.Show(parent, errorText, "Fehler");
             return cList;
         }
 
         /// <summary>
         /// Verbindet mit den hinterlegten Login-Daten zum Server und sucht nach geänderten Karten.
         /// </summary>
-        /// <returns>Der Seiten-Quelltext, nur zu Testzwecken.</returns>
         private void ConnectionWorker(string newField, IntPtr dummy)
         {
             sts.Invoke((MethodInvoker)delegate {
@@ -219,9 +224,6 @@ namespace ChartButlerCS
                         return;
                     }
 
-                    // Kartenverzeichnis anlegen
-                    Directory.CreateDirectory(newField.ToUpper() + " - " + FieldName);
-
                     afrow = chartButlerDataset.Airfields.NewAirfieldsRow();
                     afrow.ICAO = newField.ToUpper();
                     afrow.AFname = FieldName;
@@ -246,6 +248,9 @@ namespace ChartButlerCS
                         sts.progressBar.Maximum = 3 + LinkList.Count;
                         sts.progressBar.PerformStep();
                         sts.txtProgress.AppendText("Hole Karten-Dateien ab..." + Environment.NewLine); });
+
+                    // Kartenverzeichnis anlegen
+                    Directory.CreateDirectory(newField.ToUpper() + " - " + FieldName);
 
                     bool update_tripkit = true;
                     foreach (ChartLink cl in LinkList)

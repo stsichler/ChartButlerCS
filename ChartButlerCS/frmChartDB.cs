@@ -112,8 +112,9 @@ namespace ChartButlerCS
 
             if (showOptions)
                 cmdOptions_Click(this, new EventArgs());
-
+#if !DEBUG
             beginCheckForLatestRelease();
+#endif
         }
 
         private void frmChartDB_FormClosing(object sender, FormClosingEventArgs e)

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Stefan Sichler")]
 [assembly: AssemblyProduct("ChartButler")]
-[assembly: AssemblyCopyright("Copyright © 2017-2020 Stefan Sichler")]
+[assembly: AssemblyCopyright("Copyright © 2017-2022 Stefan Sichler")]
 [assembly: AssemblyTrademark("ChartButler")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.6.1.0")]
-[assembly: AssemblyFileVersion("1.6.1.0")]
+[assembly: AssemblyVersion("1.6.1.1")]
+[assembly: AssemblyFileVersion("1.6.1.1")]
