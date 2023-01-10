@@ -50,12 +50,8 @@ namespace ChartButlerCS
         /// 3 Karten pro Flugplatz angenommen.
         /// </summary>
         dlgStatus sts = new dlgStatus();
-        private struct TextPos
-        {
-            public string text;
-            public int pos;
-        }
-        private DateTime UpDate = new DateTime();
+
+        private DateTime Update = new DateTime();
         List<string> AFlist = new List<string>();
 
         public struct ChartLink
@@ -117,7 +113,7 @@ namespace ChartButlerCS
         {
             m_Upd = pUpdate;
             sts.CreateControl();
-			IntPtr dummy = sts.Handle; // sicherstellen, dass das Fensterhande vor Threadbeginn existiert
+			IntPtr dummy = sts.Handle; // sicherstellen, dass das Fensterhandle vor Threadbeginn existiert
             Thread worker = new Thread(() =>
                {
                    try
@@ -235,7 +231,7 @@ namespace ChartButlerCS
 
                         sts.txtProgress.AppendText("Lade Karten-Liste..." ); });
                     string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + newField + "&SID=" + SID;
-                    string afresult = GetURLText(AFSite);
+                    string afresult = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
                     LinkList = GetChartLinks(afresult);
                     if (LinkList.Count == 0)
                     {
@@ -270,15 +266,6 @@ namespace ChartButlerCS
                 }
             }
         }
-
-        private static void DownloadFileFromURL(string tmpPdfPath, string URL)
-        {
-            using (WebClient dlcl = new WebClient())
-            {
-                dlcl.DownloadFile(new Uri(URL), tmpPdfPath);
-            }
-        }
-
         
         /// <summary>
         /// Ruft die Seite der zuletzt geänderten Charts auf,
@@ -288,10 +275,10 @@ namespace ChartButlerCS
         private void CheckForNewCharts()
         {
             // Datum des letzten AIP Updates ermitteln
-            string htmlText = GetURLText(InsertSID(Settings.Default.ServerAmendedURL, SID));
-            UpDate = DateTime.Parse(GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:").text);
+            string htmlText = Utility.GetURLText(InsertSID(Settings.Default.ServerAmendedURL, SID), ServerCertificateValidationCallback);
+            Update = DateTime.Parse(Utility.GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:").text);
 
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+UpDate.ToShortDateString()+ Environment.NewLine); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+Update.ToShortDateString()+ Environment.NewLine); });
 
             bool full_update_required = true;
             bool same_chartbutler_version = (chartButlerDataset.ChartButler.Count != 0 
@@ -301,10 +288,10 @@ namespace ChartButlerCS
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + Environment.NewLine); });
-                if ((UpDate - lastUpdate).Days == Settings.Default.UpdateInterval && same_chartbutler_version)
+                if ((Update - lastUpdate).Days == Settings.Default.UpdateInterval && same_chartbutler_version)
                     full_update_required = false;
 
-                if (UpDate == lastUpdate && same_chartbutler_version)
+                if (Update == lastUpdate && same_chartbutler_version)
                 {
                     sts.Invoke((MethodInvoker)delegate {
                         sts.txtProgress.AppendText(Environment.NewLine + "Keine Aktualisierung notwendig!" + Environment.NewLine);
@@ -330,7 +317,7 @@ namespace ChartButlerCS
                 int lasti = 0;
                 while (true)
                 {
-                    TextPos Icao = GetTextAfterPhrase(htmlText, "&ICAO=", 4, i);
+                    Utility.TextPos Icao = Utility.GetTextAfterPhrase(htmlText, "&ICAO=", 4, i);
                     i = Icao.pos;
                     if (i < lasti)
                         break;
@@ -345,9 +332,9 @@ namespace ChartButlerCS
             UpdateCharts(AFlist);
 
             if (chartButlerDataset.AIP.Count == 0)
-                chartButlerDataset.AIP.AddAIPRow(UpDate);
+                chartButlerDataset.AIP.AddAIPRow(Update);
             else
-                chartButlerDataset.AIP[0].LastUpdate = UpDate;
+                chartButlerDataset.AIP[0].LastUpdate = Update;
         }
 
        
@@ -366,7 +353,7 @@ namespace ChartButlerCS
                 {
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten..." + Environment.NewLine); });
                     string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + ICAO + "&SID=" + SID;
-                    string afresult = GetURLText(AFSite);
+                    string afresult = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
                     LinkList = GetChartLinks(afresult);
                     sts.Invoke((MethodInvoker)delegate {
                         sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
@@ -399,7 +386,7 @@ namespace ChartButlerCS
         /// <returns>Die Session-ID.</returns>
         private string GetSID(string htmlStream)
         {
-            TextPos tp = GetTextBetween(htmlStream, "SID=", "\"");           
+            Utility.TextPos tp = Utility.GetTextBetween(htmlStream, "SID=", "\"");           
             return tp.text;
         }
 
@@ -417,12 +404,12 @@ namespace ChartButlerCS
                 int fstlpos = lpos;
                 while (lpos >= fstlpos)
                 {
-                    TextPos ChartBuf = GetTextBetween(AFstream, "pdfkarten.php?&icao=", "&", lpos);
+                    Utility.TextPos ChartBuf = Utility.GetTextBetween(AFstream, "pdfkarten.php?&icao=", "&", lpos);
                     lpos = ChartBuf.pos;
                     if (lpos < fstlpos || ChartBuf.text.Contains("W3C"))
                         break;
 
-                    TextPos previewBuf = GetTextBetween(AFstream, "flugplaetze/karten/", "&", lpos);
+                    Utility.TextPos previewBuf = Utility.GetTextBetween(AFstream, "flugplaetze/karten/", "&", lpos);
                     lpos = previewBuf.pos;
                     if (lpos < fstlpos || ChartBuf.text.Contains("W3C"))
                         break;
@@ -439,7 +426,7 @@ namespace ChartButlerCS
             if (lpos != -1)
             {
                 int fstlpos = lpos;
-                TextPos TripKitBuf = GetTextBetween(AFstream, "pdftripkit.php?icao=", "&", lpos);
+                Utility.TextPos TripKitBuf = Utility.GetTextBetween(AFstream, "pdftripkit.php?icao=", "&", lpos);
                 lpos = TripKitBuf.pos;
                 if (lpos >= fstlpos && !TripKitBuf.text.Contains("W3C"))
                 {
@@ -489,7 +476,7 @@ namespace ChartButlerCS
                         Cname = afrow.ICAO + "_" + "TripKit_Charts.pdf";
                     else
                     {
-                        string previewName = GetTextBetween(chartLink.previewURL, afrow.ICAO.ToLower() + "_", ".jpg").text;
+                        string previewName = Utility.GetTextBetween(chartLink.previewURL, afrow.ICAO.ToLower() + "_", ".jpg").text;
                         if (previewName.StartsWith("voc"))
                             Cname = afrow.ICAO + "_" + "VisualOperationChart" + previewName.Substring(3) + ".pdf";
                         else if (previewName.StartsWith("adc"))
@@ -518,12 +505,12 @@ namespace ChartButlerCS
                 }
 
                 if (!is_tripkit_chart)
-                    DownloadFileFromURL(tmpPreviewPath, chartLink.previewURL);
+                    Utility.DownloadFileFromURL(tmpPreviewPath, chartLink.previewURL);
                 string CFullPath = frmChartDB.BuildChartPdfPath(chartRow);
                 string previewPath = is_tripkit_chart ? "" : frmChartDB.BuildChartPreviewJpgPath(chartRow);
 
                 if (m_Upd && !is_new_chart 
-                    && ((is_tripkit_chart && !tripkit_needs_update) || (!is_tripkit_chart && FileEquals(tmpPreviewPath, previewPath))))
+                    && ((is_tripkit_chart && !tripkit_needs_update) || (!is_tripkit_chart && Utility.FileEquals(tmpPreviewPath, previewPath))))
                 {
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("ist aktuell." + Environment.NewLine); });
                     return false;
@@ -535,7 +522,7 @@ namespace ChartButlerCS
                     else
                         sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("wird aktualisiert... "); });
 
-                    DownloadFileFromURL(tmpPdfPath, chartLink.pdfURL);
+                    Utility.DownloadFileFromURL(tmpPdfPath, chartLink.pdfURL);
                     File.Delete(CFullPath);
                     File.Move(tmpPdfPath, CFullPath);
 
@@ -551,16 +538,16 @@ namespace ChartButlerCS
 
                     if (m_Upd)
                     {
-                        ChartButlerDataSet.UpdatesRow updrow = chartButlerDataset.Updates.FindByDate(UpDate);
+                        ChartButlerDataSet.UpdatesRow updrow = chartButlerDataset.Updates.FindByDate(Update);
                         if (updrow == null)
                         {
-                            updrow = chartButlerDataset.Updates.AddUpdatesRow(UpDate);
+                            updrow = chartButlerDataset.Updates.AddUpdatesRow(Update);
                             // nur die letzten 5 Aktualisierungen merken
                             while (chartButlerDataset.Updates.Count > 5)
                                 chartButlerDataset.Updates.RemoveUpdatesRow(chartButlerDataset.Updates[0]);
                         }
-                        chartRow.LastUpdate = UpDate;
-                        chartRow.AirfieldsRow.LastUpdate = UpDate;
+                        chartRow.LastUpdate = Update;
+                        chartRow.AirfieldsRow.LastUpdate = Update;
                     }
 
                     if (is_new_chart)
@@ -583,69 +570,14 @@ namespace ChartButlerCS
                     File.Delete(tmpPdfPath);
             }
         }
-
-       /// <summary>
-       /// Öffnet eine URL und stellt den Inhalt als Quelltext zur Verfügung.
-       /// </summary>
-       /// <param name="URL">Die auszulesende URL.</param>
-       /// <returns>Der Seiten-Quelltext der URL als string-Objekt.</returns>
-        private string GetURLText(string URL)
-        {            
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(URL);
-            request.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
-            request.Method = "GET";
-            request.ContentType = "text/html;charset=iso-8859-1";
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader dlread = new StreamReader(response.GetResponseStream(),Encoding.GetEncoding("ISO-8859-1"));
-            string responseText = dlread.ReadToEnd();
-            response.Close();
-            dlread.Close();
-            return responseText;
-        }
-
-        /// <summary>
-        /// Sucht in einem String-Objekt nach einem spezifizierten Text-Teil und stellt 
-        /// die [numChars] Zeichen nach dessen Vorkommen zur Verfügung.
-        /// </summary>
-        /// <param name="ContainingText">Der zu durchsuchende Text.</param>
-        /// <param name="SearchPhrase">Das Einleitungs-Suchmuster</param>
-        /// <param name="numChars">Die Anzahl der zu lesenden Zeichen.</param>
-        /// <param name="StartAtPos">Optional: Der Startpunkt, default = 0.</param>
-        /// <returns>Die gefundene Zeichenkette und die Position dahinter.</returns>
-        private TextPos GetTextAfterPhrase(string ContainingText, string SearchPhrase, int numChars, int StartAtPos=0)
-        {
-            TextPos result = new TextPos();
-            int Cnt = ContainingText.IndexOf(SearchPhrase, StartAtPos) + SearchPhrase.Length;
-            result.pos = Cnt + numChars;
-            result.text = ContainingText.Substring(Cnt, numChars);
-            return result;
-        }
-
-        /// <summary>
-        /// Stellt die zwischen zwei Teilzeichenfolgen stehende Zeichenfolge aus einem String zur Verfügung.
-        /// </summary>
-        /// <param name="ContainingText">Die zu durchsuchende Zeichenfolge.</param>
-        /// <param name="SearchPhrase">Die einleitende Zeichenfolge.</param>
-        /// <param name="StopPhrase">Die Abschluss-Zeichenfolge.</param>
-        /// <param name="StartAtPos">Optional: Der Startpunkt, default = 0.</param>
-        /// <returns>Die gefundene Zeichenkette.</returns>
-        private TextPos GetTextBetween(string ContainingText, string SearchPhrase, string StopPhrase, int StartAtPos=0)
-        {
-            TextPos result = new TextPos();
-            int CntStart = ContainingText.IndexOf(SearchPhrase, StartAtPos) + SearchPhrase.Length;
-            int CntStop = ContainingText.IndexOf(StopPhrase, CntStart);
-            result.pos = CntStop;
-            result.text = ContainingText.Substring(CntStart, (CntStop - CntStart));
-            return result;
-        }
-
+        
         /// <summary>
         /// Fügt eine Session-ID in eine URL ein.
         /// </summary>
         /// <param name="URL">Die URL-Zeichenfolge.</param>
         /// <param name="SID">Die SID-Zeichenfolge.</param>
         /// <returns>Die URL mit SID als Zeichenfolge</returns>
-        private string InsertSID(string URL, string SID)
+        private static string InsertSID(string URL, string SID)
         {
             string UrlSid = null;
             int Cnt = URL.IndexOf("&SID=") + 5;
@@ -657,8 +589,8 @@ namespace ChartButlerCS
         public void CheckForNewField(string Searchstr, ref string FieldIcao)
         {
             string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + Searchstr + "&SID=" + SID;
-            string html = GetURLText(AFSite);
-            string Field = GetTextBetween(html, "300px\">", "</td>").text;
+            string html = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
+            string Field = Utility.GetTextBetween(html, "300px\">", "</td>").text;
             if (Field.Length != 0)
             {                
                 Field = Field.Replace("/", "-"); 
@@ -680,42 +612,6 @@ namespace ChartButlerCS
                 FieldIcao = Field;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Platz erkannt: " + Field + Environment.NewLine); });
             }
-        }
-
-        /// <summary>
-        /// Binary comparison of two files
-        /// </summary>
-        /// <param name="fileName1">the file to compare</param>
-        /// <param name="fileName2">the other file to compare</param>
-        /// <returns>a value indicateing weather the file are identical</returns>
-        public static bool FileEquals(string fileName1, string fileName2)
-        {
-            if (!File.Exists(fileName1) || !File.Exists(fileName2))
-                return false;
-
-            FileInfo info1 = new FileInfo(fileName1);
-            FileInfo info2 = new FileInfo(fileName2);
-            bool same = info1.Length == info2.Length;
-            
-            if (same)
-            {
-                using (FileStream fs1 = info1.OpenRead())
-                using (FileStream fs2 = info2.OpenRead())
-                using (BufferedStream bs1 = new BufferedStream(fs1))
-                using (BufferedStream bs2 = new BufferedStream(fs2))
-                {
-                    for (long i = 0; i < info1.Length; i++)
-                    {
-                        if (bs1.ReadByte() != bs2.ReadByte())
-                        {
-                            same = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return same;
         }
 
     }// END CLASS

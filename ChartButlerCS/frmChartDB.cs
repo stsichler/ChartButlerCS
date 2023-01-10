@@ -569,7 +569,7 @@ namespace ChartButlerCS
                 {
                     string tmpDbPath = Path.GetTempFileName();
                     chartButlerDataSet.WriteXml(tmpDbPath);
-                    if (!CServerConnection.FileEquals(tmpDbPath, dbPath))
+                    if (!Utility.FileEquals(tmpDbPath, dbPath))
                     {
                         File.Delete(dbPath);
                         File.SetAttributes(tmpDbPath, FileAttributes.Hidden);
