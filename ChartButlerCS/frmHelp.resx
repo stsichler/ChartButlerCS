@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="richTextBox1.Text" xml:space="preserve">
     <value>
@@ -162,6 +162,13 @@ Dieses Programm ist frei erhältlich und ist für alle Kunden von GAT24.de lizen
 
 Kartenmaterial von EuroGAT24 GmbH, https://www.gat24.de
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
+
+Dieses Programm verwendet Teile der PDFsharp Bibliothek.
+PDFsharp - A .NET library for processing PDF
+Autor: Stefan Lange (mailto:Stefan.Lange@pdfsharp.com)
+Copyright (c) 2005-2009 empira Software GmbH, Cologne (Germany)
+http://www.pdfsharp.com
+http://sourceforge.net/projects/pdfsharp
 
 Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
 
