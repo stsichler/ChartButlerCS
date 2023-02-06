@@ -82,6 +82,7 @@
       <DependentUpon>ChartButlerDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="CServerConnection.cs" />
+    <Compile Include="CServerConnectionGAT24.cs" />
     <Compile Include="CUpdateOverview.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -471,9 +472,11 @@
     <None Include="Icon1.svg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="gat24.jpg" />
     <Content Include="Icon1.ico" />
+    <Content Include="Icon1.png" />
     <Content Include="PdfSharp\PdfSharp.SharpZipLib\ReadMe.txt" />
+    <None Include="Resources\GAT24.jpg" />
+    <None Include="Resources\DFS.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

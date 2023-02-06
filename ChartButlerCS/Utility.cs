@@ -63,11 +63,6 @@ namespace ChartButlerCS
             httpBodyTask.Wait();
             return httpBodyTask.Result;
         }
-        public struct TextPos
-        {
-            public string text;
-            public int pos;
-        }
 
         /// <summary>
         /// Sucht in einem String-Objekt nach einem spezifizierten Text-Teil und stellt 
@@ -76,15 +71,13 @@ namespace ChartButlerCS
         /// <param name="ContainingText">Der zu durchsuchende Text.</param>
         /// <param name="SearchPhrase">Das Einleitungs-Suchmuster</param>
         /// <param name="numChars">Die Anzahl der zu lesenden Zeichen.</param>
-        /// <param name="StartAtPos">Optional: Der Startpunkt, default = 0.</param>
-        /// <returns>Die gefundene Zeichenkette und die Position dahinter.</returns>
-        public static TextPos GetTextAfterPhrase(string ContainingText, string SearchPhrase, int numChars, int StartAtPos = 0)
+        /// <param name="StartAtPos">Der Startpunkt. Er wird auf die Position nach dem abschließenden Ausdruck erhöht.</param>
+        /// <returns>Die gefundene Zeichenkette.</returns>
+        public static string GetTextAfterPhrase(string ContainingText, string SearchPhrase, int numChars, ref int StartAtPos)
         {
-            TextPos result = new TextPos();
             int Cnt = ContainingText.IndexOf(SearchPhrase, StartAtPos) + SearchPhrase.Length;
-            result.pos = Cnt + numChars;
-            result.text = ContainingText.Substring(Cnt, numChars);
-            return result;
+            StartAtPos = Cnt + numChars;
+            return ContainingText.Substring(Cnt, numChars);
         }
 
         /// <summary>
@@ -93,22 +86,23 @@ namespace ChartButlerCS
         /// <param name="ContainingText">Die zu durchsuchende Zeichenfolge.</param>
         /// <param name="SearchPhrase">Die einleitende Zeichenfolge.</param>
         /// <param name="StopPhrase">Die Abschluss-Zeichenfolge.</param>
-        /// <param name="StartAtPos">Optional: Der Startpunkt, default = 0.</param>
+        /// <param name="StartAtPos">Der Startpunkt. Er wird auf die Position nach dem abschließenden Ausdruck erhöht
+        /// oder auf -1 gesetzt, falls kein Fund vorliegt.</param>
         /// <returns>Die gefundene Zeichenkette.</returns>
-        public static TextPos GetTextBetween(string ContainingText, string SearchPhrase, string StopPhrase, int StartAtPos = 0)
+        public static string GetTextBetween(string ContainingText, string SearchPhrase, string StopPhrase, ref int StartAtPos)
         {
-            TextPos result = new TextPos();
+            string result = string.Empty;
             int CntStart = ContainingText.IndexOf(SearchPhrase, StartAtPos);
             if (CntStart > 0)
             {
                 CntStart += SearchPhrase.Length;
                 int CntStop = ContainingText.IndexOf(StopPhrase, CntStart);
-                result.pos = CntStop;
-                result.text = ContainingText.Substring(CntStart, (CntStop - CntStart));
+                StartAtPos = CntStop + StopPhrase.Length;
+                result = ContainingText.Substring(CntStart, (CntStop - CntStart));
             }
             else
             {
-                result.pos = -1;
+                StartAtPos = -1;
             }
             return result;
         }

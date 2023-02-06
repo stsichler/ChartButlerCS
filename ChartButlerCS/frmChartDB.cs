@@ -397,7 +397,7 @@ namespace ChartButlerCS
         private void cmdUpdateCharts_Click(object sender, EventArgs e)
         {
             CServerConnection cConn = new CServerConnection(this,chartButlerDataSet);            
-            clist = cConn.Establish(true, null);
+            clist = cConn.Establish(null);
             updateTreeView(); 
             updateDataBase();
             updateUpdateRequiredPanel();
@@ -415,7 +415,7 @@ namespace ChartButlerCS
             if (res == System.Windows.Forms.DialogResult.OK)
             {
                 CServerConnection conn = new CServerConnection(this,chartButlerDataSet);
-                clist = conn.Establish(false, srchString);
+                clist = conn.Establish(srchString);
                 updateTreeView();
                 updateDataBase();
                 if (clist != null && clist.Count != 0)
