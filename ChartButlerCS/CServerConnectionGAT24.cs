@@ -5,9 +5,6 @@ using System.Text;
 using System.Reflection;
 using System.Net;
 using System.Windows.Forms;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using System.Threading;
 
 namespace ChartButlerCS
 {
@@ -20,6 +17,13 @@ namespace ChartButlerCS
         /// Session ID der Verbindung
         /// </summary>
         private string GAT24_SID;
+
+        public struct GAT24_ChartLink
+        {
+            public string crypt; // encrypted ID of GAT24 
+            public string pdfURL; // link to pdf
+            public string previewURL; // link to preview jpg
+        }
 
         /// <summary>
         /// Verbindet mit den hinterlegten Login-Daten zum Server und sucht nach geänderten Karten.
@@ -44,7 +48,7 @@ namespace ChartButlerCS
             string resultSet = "";
             try
             {
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(ChartButlerCS.Settings.Default.ServerURL);
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(ChartButlerCS.Settings.Default.GAT24_ServerURL);
                 request.ServerCertificateValidationCallback += ServerCertificateValidationCallback;
                 request.Method = "POST";
                 request.ContentType = "application/x-www-form-urlencoded";
@@ -94,27 +98,27 @@ namespace ChartButlerCS
         /// <summary>
         /// Fügt der Datenbank einen neuen Flugpatz hinzu.
         /// </summary>
-        /// <param name="newField">Der ICAO Code des Flugplatzes</param>
-        private void GAT24_AddNewField(string newField)
+        /// <param name="newFieldICAO">Der ICAO Code des Flugplatzes</param>
+        private void GAT24_AddNewField(string newFieldICAO)
         {
             string FieldName = null;
-            GAT24_SearchField(newField, ref FieldName);
+            GAT24_SearchField(newFieldICAO, ref FieldName);
             if (FieldName != null)
             {
-                newField = newField.ToUpper();
+                newFieldICAO = newFieldICAO.ToUpper();
                 sts.Invoke((MethodInvoker)delegate {
-                    sts.txtProgress.AppendText("Hole neuen Flugplatz: " + newField + Environment.NewLine);
+                    sts.txtProgress.AppendText("Hole neuen Flugplatz: " + newFieldICAO + Environment.NewLine);
                     sts.txtProgress.AppendText("Erzeuge Datenbank-Einträge...");
                 });
-                ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(newField);
+                ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(newFieldICAO);
                 if (afrow != null)
                 {
-                    errorText = "Flugplatz " + newField + " ist bereits vorhanden.";
+                    errorText = "Flugplatz " + newFieldICAO + " ist bereits vorhanden.";
                     return;
                 }
 
                 afrow = chartButlerDataset.Airfields.NewAirfieldsRow();
-                afrow.ICAO = newField.ToUpper();
+                afrow.ICAO = newFieldICAO;
                 afrow.AFname = FieldName;
                 chartButlerDataset.Airfields.AddAirfieldsRow(afrow);
 
@@ -124,10 +128,10 @@ namespace ChartButlerCS
 
                     sts.txtProgress.AppendText("Lade Karten-Liste...");
                 });
-                string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + newField + "&SID=" + GAT24_SID;
+                string AFSite = ChartButlerCS.Settings.Default.GAT24_ServerAirFieldURL + newFieldICAO + "&SID=" + GAT24_SID;
                 string afresult = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
-                LinkList = GAT24_GetChartLinks(afresult);
-                if (LinkList.Count == 0)
+                List<GAT24_ChartLink> chartLinks = GAT24_GetChartLinks(afresult);
+                if (chartLinks.Count == 0)
                 {
                     errorText = "Es sind keine Karten verfügbar!";
                     return;
@@ -135,19 +139,26 @@ namespace ChartButlerCS
                 sts.Invoke((MethodInvoker)delegate {
                     sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
 
-                    sts.progressBar.Maximum = 3 + LinkList.Count;
+                    sts.progressBar.Maximum = 3 + chartLinks.Count;
                     sts.progressBar.PerformStep();
                     sts.txtProgress.AppendText("Hole Karten-Dateien ab..." + Environment.NewLine);
                 });
 
                 // Kartenverzeichnis anlegen
-                Directory.CreateDirectory(newField.ToUpper() + " - " + FieldName);
-
-                bool update_tripkit = true;
-                foreach (ChartLink cl in LinkList)
+                Directory.CreateDirectory(newFieldICAO + " - " + FieldName);
+                try
                 {
-                    GAT24_DownloadAndCheckChart(true, cl, afrow, ref update_tripkit);
-                    sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
+                    bool update_tripkit = true;
+                    foreach (GAT24_ChartLink cl in chartLinks)
+                    {
+                        GAT24_DownloadAndCheckChart(true, cl, afrow, ref update_tripkit);
+                        sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
+                    }
+                }
+                catch (Exception)
+                {
+                    Directory.Delete(newFieldICAO + " - " + FieldName, true);
+                    throw;
                 }
 
                 sts.Invoke((MethodInvoker)delegate {
@@ -158,7 +169,7 @@ namespace ChartButlerCS
             }
             else
             {
-                errorText = "Flugplatz " + newField + " nicht gefunden!";
+                errorText = "Flugplatz " + newFieldICAO + " nicht gefunden!";
             }
         }
 
@@ -170,7 +181,7 @@ namespace ChartButlerCS
         private void GAT24_CheckForNewCharts()
         {
             // Datum des letzten AIP Updates ermitteln
-            string htmlText = Utility.GetURLText(GAT24_InsertSID(Settings.Default.ServerAmendedURL, GAT24_SID), ServerCertificateValidationCallback);
+            string htmlText = Utility.GetURLText(GAT24_InsertSID(Settings.Default.GAT24_ServerAmendedURL, GAT24_SID), ServerCertificateValidationCallback);
             int pos = 0;
             Update = DateTime.Parse(Utility.GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:", ref pos));
 
@@ -184,7 +195,7 @@ namespace ChartButlerCS
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + Environment.NewLine); });
-                if ((Update - lastUpdate).Days == Settings.Default.UpdateInterval && same_chartbutler_version)
+                if ((Update - lastUpdate).Days == Settings.Default.AiracUpdateInterval && same_chartbutler_version)
                     full_update_required = false;
 
                 if (Update == lastUpdate && same_chartbutler_version)
@@ -196,6 +207,8 @@ namespace ChartButlerCS
                     return;
                 }
             }
+
+            List<string> AFlist = new List<string>();
 
             if (full_update_required)
             {
@@ -245,14 +258,14 @@ namespace ChartButlerCS
                 if (afrow != null)
                 {
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten..." + Environment.NewLine); });
-                    string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + ICAO + "&SID=" + GAT24_SID;
+                    string AFSite = ChartButlerCS.Settings.Default.GAT24_ServerAirFieldURL + ICAO + "&SID=" + GAT24_SID;
                     string afresult = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
-                    LinkList = GAT24_GetChartLinks(afresult);
+                    List<GAT24_ChartLink> chartLinks = GAT24_GetChartLinks(afresult);
                     sts.Invoke((MethodInvoker)delegate {
-                        sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
+                        sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + chartLinks.Count;
                         sts.progressBar.PerformStep(); });
                     bool tripkit_needs_update = false;
-                    foreach (ChartLink cl in LinkList)
+                    foreach (GAT24_ChartLink cl in chartLinks)
                     {
                         GAT24_DownloadAndCheckChart(false, cl, afrow, ref tripkit_needs_update);
                         sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
@@ -288,9 +301,9 @@ namespace ChartButlerCS
         /// </summary>
         /// <param name="AFstream">Der HTML-Quelltext, der die Links enthält.</param>
         /// <returns>Ein Liste mit den Download-Links. Das TripKit PDF, falls vorhanden, wird als letztes hinzugefügt.</returns>
-        private List<ChartLink> GAT24_GetChartLinks(string AFstream)
+        private List<GAT24_ChartLink> GAT24_GetChartLinks(string AFstream)
         {
-            List<ChartLink> ChartLinks = new List<ChartLink>();
+            List<GAT24_ChartLink> ChartLinks = new List<GAT24_ChartLink>();
             int lpos = AFstream.IndexOf("pdfkarten.php?&icao=");
             if (lpos != -1)
             {
@@ -305,10 +318,10 @@ namespace ChartButlerCS
                     if (lpos < fstlpos || previewBuf.Contains("W3C"))
                         break;
 
-                    ChartLink lnk = new ChartLink();
+                    GAT24_ChartLink lnk = new GAT24_ChartLink();
                     lnk.crypt = ChartBuf;
-                    lnk.pdfURL = ChartButlerCS.Settings.Default.ServerChartURL + ChartBuf + "&SID=" + GAT24_SID;
-                    lnk.previewURL = ChartButlerCS.Settings.Default.ServerChartPreviewURL + previewBuf + "&SID=" + GAT24_SID;
+                    lnk.pdfURL = ChartButlerCS.Settings.Default.GAT24_ServerChartURL + ChartBuf + "&SID=" + GAT24_SID;
+                    lnk.previewURL = ChartButlerCS.Settings.Default.GAT24_ServerChartPreviewURL + previewBuf + "&SID=" + GAT24_SID;
 
                     ChartLinks.Add(lnk);
                 }
@@ -321,9 +334,9 @@ namespace ChartButlerCS
 
                 if (lpos >= fstlpos && !TripKitBuf.Contains("W3C"))
                 {
-                    ChartLink lnk = new ChartLink();
+                    GAT24_ChartLink lnk = new GAT24_ChartLink();
                     lnk.crypt = TripKitBuf;
-                    lnk.pdfURL = ChartButlerCS.Settings.Default.ServerTripKitURL + TripKitBuf + "&SID=" + GAT24_SID;
+                    lnk.pdfURL = ChartButlerCS.Settings.Default.GAT24_ServerTripKitURL + TripKitBuf + "&SID=" + GAT24_SID;
                     lnk.previewURL = "tripkit";
 
                     ChartLinks.Add(lnk);
@@ -338,10 +351,10 @@ namespace ChartButlerCS
         /// <param name="init">Wahr, falls es sich um einen neuen Flugplatz handelt, falsch, falls ein existierender Platz aktualisiert wird.</param>
         /// <param name="chartLink">Der Download-Link zur Karte.</param>
         /// <returns>True, falls die Karte neu angelegt oder ersetzt wurde.</returns>
-        private bool GAT24_DownloadAndCheckChart(bool init, ChartLink chartLink, ChartButlerDataSet.AirfieldsRow afrow, ref bool tripkit_needs_update)
+        private bool GAT24_DownloadAndCheckChart(bool init, GAT24_ChartLink chartLink, ChartButlerDataSet.AirfieldsRow afrow, ref bool tripkit_needs_update)
         {
             string tmpPreviewPath = Path.GetTempFileName();
-            string tmpPdfPath = Path.GetTempFileName();
+            string tmpChartPath = Path.GetTempFileName();
 
             try
             {
@@ -358,7 +371,7 @@ namespace ChartButlerCS
                     bsCH.Position = tpos;
                     chartRow = (ChartButlerDataSet.AFChartsRow)((System.Data.DataRowView)bsCH.Current).Row;
 
-                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(chartRow.Cname + " ... "); });
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(chartRow.Cname + "... "); });
                 }
                 else
                 {
@@ -378,7 +391,7 @@ namespace ChartButlerCS
                             Cname = afrow.ICAO + "_" + "UnknownChart" + previewName + ".pdf";
                     }
 
-                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(Cname + " ... "); });
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(Cname + "... "); });
 
                     bsCH.Position = 0;
                     tpos = bsCH.Find("Cname", Cname);
@@ -399,8 +412,8 @@ namespace ChartButlerCS
 
                 if (!is_tripkit_chart)
                     Utility.DownloadFileFromURL(tmpPreviewPath, chartLink.previewURL);
-                string CFullPath = frmChartDB.BuildChartPdfPath(chartRow);
-                string previewPath = is_tripkit_chart ? "" : frmChartDB.BuildChartPreviewJpgPath(chartRow);
+                string CFullPath = Utility.BuildChartPath(chartRow);
+                string previewPath = is_tripkit_chart ? "" : Utility.BuildChartPreviewPath(chartRow, "jpg");
 
                 if (!init && !is_new_chart 
                     && ((is_tripkit_chart && !tripkit_needs_update) || (!is_tripkit_chart && Utility.FileEquals(tmpPreviewPath, previewPath))))
@@ -415,9 +428,9 @@ namespace ChartButlerCS
                     else
                         sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("wird aktualisiert... "); });
 
-                    Utility.DownloadFileFromURL(tmpPdfPath, chartLink.pdfURL);
+                    Utility.DownloadFileFromURL(tmpChartPath, chartLink.pdfURL);
                     File.Delete(CFullPath);
-                    File.Move(tmpPdfPath, CFullPath);
+                    File.Move(tmpChartPath, CFullPath);
 
                     if (!is_tripkit_chart)
                     {
@@ -459,8 +472,8 @@ namespace ChartButlerCS
             {
                 if (File.Exists(tmpPreviewPath))
                     File.Delete(tmpPreviewPath);
-                if (File.Exists(tmpPdfPath))
-                    File.Delete(tmpPdfPath);
+                if (File.Exists(tmpChartPath))
+                    File.Delete(tmpChartPath);
             }
         }
         
@@ -482,11 +495,11 @@ namespace ChartButlerCS
         /// <summary>
         /// Sucht nach einem Flugplatz.
         /// </summary>
-        /// <param name="Searchstr">Der Flugplatz, nach dem gesucht werden soll</param>
-        /// <param name="FieldIcao">Die ICAO Kennung des Flugplatzes</param>
-        public void GAT24_SearchField(string Searchstr, ref string FieldIcao)
+        /// <param name="Searchstr">Die ICAO Kennung des Flugplatzes, nach dem gesucht werden soll</param>
+        /// <param name="FieldName">Name des Flugplatzes</param>
+        public void GAT24_SearchField(string Searchstr, ref string FieldName)
         {
-            string AFSite = ChartButlerCS.Settings.Default.ServerAirFieldURL + Searchstr + "&SID=" + GAT24_SID;
+            string AFSite = ChartButlerCS.Settings.Default.GAT24_ServerAirFieldURL + Searchstr + "&SID=" + GAT24_SID;
             string html = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
             int pos = 0;
             string Field = Utility.GetTextBetween(html, "300px\">", "</td>", ref pos);
@@ -494,7 +507,8 @@ namespace ChartButlerCS
             {                
                 Field = Field.Replace("/", "-"); 
                 Field = Field.Replace("\"","");
-
+                
+                // Groß-/Kleinschreibung korrigieren
                 string buf = Field.Substring(0,1).ToUpper();
                 for (int i = 1; i < Field.Length; i++)
                 {
@@ -508,7 +522,7 @@ namespace ChartButlerCS
                     }                    
                 }
                 Field = buf;
-                FieldIcao = Field;
+                FieldName = Field;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Platz erkannt: " + Field + Environment.NewLine); });
             }
         }

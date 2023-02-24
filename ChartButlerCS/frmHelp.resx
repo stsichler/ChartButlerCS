@@ -122,9 +122,9 @@
 Die Liste auf der linken Seite zeigt alle Flugplätze, für die Karten heruntergeladen wurden.
 Doppel-Klick auf einen Flugplatz erweitert den Eintrag, so dass alle für diesen Platz verfügbaren Karten als Unter-Knoten angezeigt werden.
 Rechtsklick auf einen ausgewählten Platz ruft ein Kontextmenü auf, über das Sie das Abonnement eines Platzes beenden und die gespeicherten Karten löschen können. 
-Doppel-Klick auf eine Karte ruft die Karte in einem PDF-Reader (z.B. Adobe (R) Reader (R)) auf.
+Doppel-Klick auf eine Karte ruft die Karte in einer externen Anwendung (z.B. für PDF Dateien im Adobe (R) Reader (R)) auf.
 
-Im mittleren Bereich sehen Sie eine Voransicht der links ausgewählten Karte in niedriger Auflösung. Doppel-Klick hierauf ruft die Karte ebenfalls im PDF-Reader auf. 
+Im mittleren Bereich sehen Sie eine Voransicht der links ausgewählten Karte in niedriger Auflösung. Doppel-Klick hierauf ruft die Karte ebenfalls in einer externen Anwendung auf. 
 
 Die rechts befindlichen Schaltflächen haben folgende Funktionen:
 

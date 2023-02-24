@@ -8,31 +8,18 @@ using System.Security.Cryptography;
 
 namespace ChartButlerCS
 {
-    public class Settings : INotifyPropertyChanged
+    public class Settings : INotifyPropertyChanged, ICloneable
     {
-        private static Settings defaultInstance = new Settings();
+        public static Settings Default = new Settings();
 
-        static byte[] s_aditionalEntropy = { 23, 42, 1, 6, 5 };
+        private static byte[] s_aditionalEntropy = { 23, 42, 1, 6, 5 };
 
-        private Dictionary<string, object> userSettings;
-        private string fileName;
+        private Dictionary<string, string> userSettings;
+
+        private string fileName = Path.Combine(Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData), "ChartButlerCS.config");
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public Settings()
-        {
-            fileName = Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.ApplicationData), "ChartButlerCS.config");
-            Reload();
-        }
-
-        public static Settings Default
-        {
-            get
-            {
-                return defaultInstance;
-            }
-        }
 
         protected void OnPropertyChanged(string name)
         {
@@ -45,11 +32,24 @@ namespace ChartButlerCS
 
         public void Init()
         {
-            userSettings = new Dictionary<string, object>();
+            userSettings = new Dictionary<string, string>();
             userSettings.Add("ChartFolder", "");
             userSettings.Add("ServerUsername", "");
             userSettings.Add("ServerPassword", null);
             userSettings.Add("EulaRead", "");
+        }
+
+        public object Clone()
+        {
+            Settings new_settings = new Settings();
+            new_settings.userSettings = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> entry in userSettings)
+            {
+                new_settings.userSettings.Add(entry.Key, (string)entry.Value?.Clone());
+            }
+            new_settings.m_DataSource = (string)m_DataSource?.Clone();
+
+            return new_settings;
         }
 
         public void Reload()
@@ -81,7 +81,7 @@ namespace ChartButlerCS
                 Init();
             }
 
-            foreach (KeyValuePair<string, object> entry in userSettings)
+            foreach (KeyValuePair<string, string> entry in userSettings)
                 OnPropertyChanged(entry.Key);
         }
 
@@ -93,7 +93,7 @@ namespace ChartButlerCS
             XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "utf-8", null);
             doc.InsertBefore(xmlDeclaration, root);
 
-            foreach (KeyValuePair<string, object> entry in userSettings)
+            foreach (KeyValuePair<string, string> entry in userSettings)
             {
                 if (entry.Value == null)
                     continue;
@@ -110,7 +110,7 @@ namespace ChartButlerCS
             doc.Save(fileName);
         }
 
-        public object this[string key]
+        public string this[string key]
         {
             get
             {
@@ -125,32 +125,7 @@ namespace ChartButlerCS
 
         // Application Constants ---------------------------------------------------------------
 
-
-        public string ServerURL
-        {
-            get
-            {
-                return "https://www.gat24.de/data.php?rubrik=aktuell&unterrubrik=neues&dokument=neues&SID=0";
-            }
-        }
-
-        public string ServerAirFieldURL
-        {
-            get
-            {
-                return "https://www.gat24.de/data.php?rubrik=briefing&unterrubrik=flugplaetze&dokument=karten&ICAO=";
-            }
-        }
-
-        public string ServerAmendedURL
-        {
-            get
-            {
-                return "https://www.gat24.de/data.php?rubrik=aktuell&unterrubrik=neues&dokument=aip_aktuell&SID=&printable=true";
-            }
-        }
-
-        public int UpdateInterval
+        public int AiracUpdateInterval
         {
             get
             {
@@ -158,7 +133,31 @@ namespace ChartButlerCS
             }
         }
 
-        public string ServerChartURL
+        public string GAT24_ServerURL
+        {
+            get
+            {
+                return "https://www.gat24.de/data.php?rubrik=aktuell&unterrubrik=neues&dokument=neues&SID=0";
+            }
+        }
+
+        public string GAT24_ServerAirFieldURL
+        {
+            get
+            {
+                return "https://www.gat24.de/data.php?rubrik=briefing&unterrubrik=flugplaetze&dokument=karten&ICAO=";
+            }
+        }
+
+        public string GAT24_ServerAmendedURL
+        {
+            get
+            {
+                return "https://www.gat24.de/data.php?rubrik=aktuell&unterrubrik=neues&dokument=aip_aktuell&SID=&printable=true";
+            }
+        }
+
+        public string GAT24_ServerChartURL
         {
             get
             {
@@ -166,7 +165,7 @@ namespace ChartButlerCS
             }
         }
 
-        public string ServerChartPreviewURL
+        public string GAT24_ServerChartPreviewURL
         {
             get
             {
@@ -174,7 +173,7 @@ namespace ChartButlerCS
             }
         }
 
-        public string ServerTripKitURL
+        public string GAT24_ServerTripKitURL
         {
             get
             {
@@ -189,6 +188,7 @@ namespace ChartButlerCS
                 return "https://stsichler.github.io/ChartButlerCS/";
             }
         }
+
         // User Settings -----------------------------------------------------------------------
 
 
@@ -255,6 +255,22 @@ namespace ChartButlerCS
                 this["EulaRead"] = value;
             }
         }
+
+        // note: this is NOT stored in the config file
+        
+        public string DataSource
+        {
+            get
+            {
+                return m_DataSource;
+            }
+            set
+            {
+                m_DataSource = value;
+                OnPropertyChanged("DataSource");
+            }
+        }
+        private string m_DataSource;
 
     }
 }

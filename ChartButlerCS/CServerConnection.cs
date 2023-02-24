@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Reflection;
-using System.Net;
 using System.Windows.Forms;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Threading;
+using System.Net.Http;
 
 namespace ChartButlerCS
 {
@@ -35,6 +32,11 @@ namespace ChartButlerCS
         string errorText;
 
         /// <summary>
+        /// HttpClient zur Serverkommunikation
+        /// </summary>
+        HttpClient httpClient = new HttpClient();
+
+        /// <summary>
         /// Status Dialog, der den Fortschritt anzeigt.
         /// Ein Wort zum progressBar: folgende Aktionen lösen einen
         /// "Fortschritt" aus:
@@ -47,17 +49,10 @@ namespace ChartButlerCS
         /// </summary>
         dlgStatus sts = new dlgStatus();
 
+        /// <summary>
+        /// derzeitiger AIRAC Update Zeitpunkt
+        /// </summary>
         private DateTime Update = new DateTime();
-        List<string> AFlist = new List<string>();
-
-        public struct ChartLink
-        {
-            public string crypt; // encrypted ID of GAT24 
-            public string pdfURL; // link to pdf
-            public string previewURL; // link to preview jpg
-        }
-
-        List<ChartLink> LinkList = new List<ChartLink>();
 
         public CServerConnection(IWin32Window parent, ChartButlerDataSet chartButlerDataSet)
         {
@@ -104,15 +99,22 @@ namespace ChartButlerCS
             return good;
         }
 
-        public List<CChart> Establish(string newField = null)
+        /// <summary>
+        /// Aktualisiert die Flugplatzdatenbank durch Daten vom Server oder fügt einen neuen Flugplatz hinzu.
+        /// </summary>
+        /// <param name="newField">Der ICAO Code eines neu hinzu zu fügenden Flugplatzes oder null, falls alle Karten aktualisiert werden sollen.</param>
+        public List<CChart> doUpdate(string newField = null)
         {
             sts.CreateControl();
-			IntPtr dummy = sts.Handle; // sicherstellen, dass das Fensterhandle vor Threadbeginn existiert
+            IntPtr dummy = sts.Handle; // sicherstellen, dass das Fensterhandle vor Threadbeginn existiert
             Thread worker = new Thread(() =>
                {
                    try
                    {
-                       GAT24_ConnectionWorker(newField, dummy);
+                       if ("DFS" == Settings.Default.DataSource)
+                           DFS_ConnectionWorker(newField, dummy);
+                       else if ("GAT24" == Settings.Default.DataSource)
+                           GAT24_ConnectionWorker(newField, dummy);
                    }
                    catch (Exception exc)
                    {
@@ -123,8 +125,8 @@ namespace ChartButlerCS
                        sts.Invoke((MethodInvoker)delegate
                        {
                            sts.txtProgress.AppendText("FEHLER! (siehe separates Fenster)" + Environment.NewLine);
+                           MessageBox.Show(parent, errorText, "Fehler");
                        });
-                       MessageBox.Show(parent, errorText, "Fehler");
                    }
                    sts.Invoke((MethodInvoker)delegate { sts.Close(); });
                });

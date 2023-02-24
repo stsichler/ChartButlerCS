@@ -39,14 +39,14 @@
             this.chkSavePW = new System.Windows.Forms.CheckBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.pgGeneral = new System.Windows.Forms.TabPage();
+            this.radioButtonGAT24 = new System.Windows.Forms.RadioButton();
+            this.radioButtonDFS = new System.Windows.Forms.RadioButton();
+            this.labelDataSource = new System.Windows.Forms.Label();
+            this.labelChartsDir = new System.Windows.Forms.Label();
             this.cmdSearch = new System.Windows.Forms.Button();
             this.txtChartPath = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.labelChartsDir = new System.Windows.Forms.Label();
-            this.labelDataSource = new System.Windows.Forms.Label();
-            this.radioButtonDFS = new System.Windows.Forms.RadioButton();
-            this.radioButtonGAT24 = new System.Windows.Forms.RadioButton();
             this.pgLogin.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.pgGeneral.SuspendLayout();
@@ -164,6 +164,46 @@
             this.pgGeneral.Text = "Allgemein";
             this.pgGeneral.UseVisualStyleBackColor = true;
             // 
+            // radioButtonGAT24
+            // 
+            this.radioButtonGAT24.AutoSize = true;
+            this.radioButtonGAT24.Location = new System.Drawing.Point(18, 123);
+            this.radioButtonGAT24.Name = "radioButtonGAT24";
+            this.radioButtonGAT24.Size = new System.Drawing.Size(59, 17);
+            this.radioButtonGAT24.TabIndex = 5;
+            this.radioButtonGAT24.Text = "GAT24";
+            this.radioButtonGAT24.UseVisualStyleBackColor = true;
+            this.radioButtonGAT24.CheckedChanged += new System.EventHandler(this.radioButtonGAT24_CheckedChanged);
+            // 
+            // radioButtonDFS
+            // 
+            this.radioButtonDFS.AutoSize = true;
+            this.radioButtonDFS.Location = new System.Drawing.Point(18, 99);
+            this.radioButtonDFS.Name = "radioButtonDFS";
+            this.radioButtonDFS.Size = new System.Drawing.Size(96, 17);
+            this.radioButtonDFS.TabIndex = 4;
+            this.radioButtonDFS.Text = "DFS BasicVFR";
+            this.radioButtonDFS.UseVisualStyleBackColor = true;
+            this.radioButtonDFS.CheckedChanged += new System.EventHandler(this.radioButtonDFS_CheckedChanged);
+            // 
+            // labelDataSource
+            // 
+            this.labelDataSource.AutoSize = true;
+            this.labelDataSource.Location = new System.Drawing.Point(15, 82);
+            this.labelDataSource.Name = "labelDataSource";
+            this.labelDataSource.Size = new System.Drawing.Size(67, 13);
+            this.labelDataSource.TabIndex = 3;
+            this.labelDataSource.Text = "Datenquelle:";
+            // 
+            // labelChartsDir
+            // 
+            this.labelChartsDir.AutoSize = true;
+            this.labelChartsDir.Location = new System.Drawing.Point(12, 24);
+            this.labelChartsDir.Name = "labelChartsDir";
+            this.labelChartsDir.Size = new System.Drawing.Size(126, 13);
+            this.labelChartsDir.TabIndex = 2;
+            this.labelChartsDir.Text = "Karten Hauptverzeichnis:";
+            // 
             // cmdSearch
             // 
             this.cmdSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -205,47 +245,6 @@
             this.panel2.Padding = new System.Windows.Forms.Padding(4);
             this.panel2.Size = new System.Drawing.Size(384, 209);
             this.panel2.TabIndex = 0;
-            // 
-            // labelChartsDir
-            // 
-            this.labelChartsDir.AutoSize = true;
-            this.labelChartsDir.Location = new System.Drawing.Point(12, 24);
-            this.labelChartsDir.Name = "labelChartsDir";
-            this.labelChartsDir.Size = new System.Drawing.Size(126, 13);
-            this.labelChartsDir.TabIndex = 2;
-            this.labelChartsDir.Text = "Karten Hauptverzeichnis:";
-            // 
-            // labelDataSource
-            // 
-            this.labelDataSource.AutoSize = true;
-            this.labelDataSource.Location = new System.Drawing.Point(15, 82);
-            this.labelDataSource.Name = "labelDataSource";
-            this.labelDataSource.Size = new System.Drawing.Size(67, 13);
-            this.labelDataSource.TabIndex = 3;
-            this.labelDataSource.Text = "Datenquelle:";
-            // 
-            // radioButtonDFS
-            // 
-            this.radioButtonDFS.AutoSize = true;
-            this.radioButtonDFS.Enabled = false;
-            this.radioButtonDFS.Location = new System.Drawing.Point(18, 99);
-            this.radioButtonDFS.Name = "radioButtonDFS";
-            this.radioButtonDFS.Size = new System.Drawing.Size(96, 17);
-            this.radioButtonDFS.TabIndex = 4;
-            this.radioButtonDFS.Text = "DFS BasicVFR";
-            this.radioButtonDFS.UseVisualStyleBackColor = true;
-            // 
-            // radioButtonGAT24
-            // 
-            this.radioButtonGAT24.AutoSize = true;
-            this.radioButtonGAT24.Checked = true;
-            this.radioButtonGAT24.Location = new System.Drawing.Point(18, 123);
-            this.radioButtonGAT24.Name = "radioButtonGAT24";
-            this.radioButtonGAT24.Size = new System.Drawing.Size(59, 17);
-            this.radioButtonGAT24.TabIndex = 5;
-            this.radioButtonGAT24.TabStop = true;
-            this.radioButtonGAT24.Text = "GAT24";
-            this.radioButtonGAT24.UseVisualStyleBackColor = true;
             // 
             // frmOptions
             // 

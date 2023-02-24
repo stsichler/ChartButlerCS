@@ -33,7 +33,7 @@
               <xs:element name="Crypt" msprop:Generator_ColumnVarNameInTable="columnCrypt" msprop:Generator_ColumnPropNameInRow="Crypt" msprop:Generator_ColumnPropNameInTable="CryptColumn" msprop:Generator_UserColumnName="Crypt" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
-                    <xs:maxLength value="32" />
+                    <xs:maxLength value="100" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
@@ -80,6 +80,7 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="Version" msprop:Generator_ColumnVarNameInTable="columnVersion" msprop:Generator_ColumnPropNameInRow="Version" msprop:Generator_ColumnPropNameInTable="VersionColumn" msprop:Generator_UserColumnName="Version" type="xs:string" minOccurs="0" />
+              <xs:element name="DataSource" msprop:Generator_ColumnVarNameInTable="columnDataSource" msprop:Generator_ColumnPropNameInRow="DataSource" msprop:Generator_ColumnPropNameInTable="DataSourceColumn" msprop:Generator_UserColumnName="DataSource" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

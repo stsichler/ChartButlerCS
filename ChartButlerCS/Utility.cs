@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Net;
 using System.Net.Http;
 using System.Net.Security;
@@ -7,13 +6,22 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using PdfSharp.Drawing;
-using PdfSharp.Pdf;
-
 namespace ChartButlerCS
 {
     static class Utility
     {
+        public static string BuildChartPath(ChartButlerDataSet.AFChartsRow chartRow)
+        {
+            return Path.Combine(Path.Combine(Settings.Default.ChartFolder,
+                chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), chartRow.Cname);
+        }
+        public static string BuildChartPreviewPath(ChartButlerDataSet.AFChartsRow chartRow, string extension)
+        {
+            return Path.Combine(Path.Combine(Settings.Default.ChartFolder,
+                chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname),
+                "." + chartRow.Cname + "_preview." + extension);
+        }
+
         /// <summary>
         /// Lädt Daten von einer URL und speichert sie als Datei.
         /// </summary>
@@ -53,7 +61,7 @@ namespace ChartButlerCS
         /// </summary>
         /// <param name="URL">Die auszulesende URL.</param>
         /// <returns>Der Seiten-Quelltext der URL als string-Objekt.</returns>
-        public static string GetURLText2(ref HttpClient httpClient, string URL)
+        public static string GetURLText2(HttpClient httpClient, Uri URL)
         {
             var httpResponseTask = httpClient.GetAsync(URL);
             httpResponseTask.Wait();
@@ -143,62 +151,6 @@ namespace ChartButlerCS
         }
 
         /// <summary>
-        /// Konvertiert ein Bild (System.Drawing.Image) in ein PDF mit angegebener Größe.
-        /// Dabei wird das Bild auf die angegebene Größe in X und Y Richtung gestreckt.
-        /// </summary>
-        /// <param name="image">Das zu konvertierende Bild</param>
-        /// <param name="pageSize">Die Größe bzw. das Seitenformat des resultierenden PDF</param>
-        /// <returns>Das PDF als Binärdaten (Byte array).</returns>
-        public static byte[] ConvertImageToPdf(Image image, PdfSharp.PageSize pageSize = PdfSharp.PageSize.A5)
-        {
-            using (var document = new PdfDocument())
-            {
-                PdfPage page = document.AddPage();
-                page.Size = pageSize;
-                using (XImage img = XImage.FromGdiPlusImage((Image)image.Clone()))
-                {
-                    XGraphics gfx = XGraphics.FromPdfPage(page);
-                    gfx.DrawImage(img, 0, 0, page.Width, page.Height);
-                }
-                using (var stream = new MemoryStream())
-                {
-                    document.Save(stream);
-                    return stream.ToArray();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Konvertiert zwei Bilder (System.Drawing.Image) in ein PDF als "TripKit" Chart im DIN A4 Format.
-        /// </summary>
-        /// <param name="image1">Das Bild, das auf der linken Seitenhälfe (in DIN A5) dargestellt werden soll.</param>
-        /// <param name="image1">Das Bild, das auf der rechten Seitenhälfe (in DIN A5) dargestellt werden soll.</param>
-        /// <returns>Das PDF als Binärdaten (Byte array).</returns>
-        public static byte[] ConvertImagesToTripKitPdf(Image image1, Image image2)
-        {
-            using (var document = new PdfDocument())
-            {
-                PdfPage page = document.AddPage();
-                page.Size = PdfSharp.PageSize.A4;
-                page.Orientation = PdfSharp.PageOrientation.Landscape;
-
-                using (XImage img1 = XImage.FromGdiPlusImage((Image)image1.Clone()))
-                using (XImage img2 = XImage.FromGdiPlusImage((Image)image2.Clone()))
-                {
-                    XGraphics gfx = XGraphics.FromPdfPage(page);
-                    gfx.DrawImage(img1, 0, 0, page.Width / 2, page.Height);
-                    gfx.DrawImage(img2, page.Width / 2, 0, page.Width / 2, page.Height);
-                }
-                using (var stream = new MemoryStream())
-                {
-                    document.Save(stream);
-                    return stream.ToArray();
-                }
-            }
-        }
-
-
-        /// <summary>
         /// Führt einen binären Vergleich zweier Dateien durch.
         /// </summary>
         /// <param name="fileName1">Pfad zu Datei 1</param>
@@ -232,6 +184,20 @@ namespace ChartButlerCS
             }
 
             return same;
+        }
+
+        /// <summary>
+        /// Erzeugt einen Dateinamen für einen angegebenen String.
+        /// Dabei werden aus dem String alle ungültigen Zeichen entweder ersetzt oder entfernt.
+        /// Optional wird eine Extension angefügt.
+        /// </summary>
+        /// <param name="name">Der String</param>
+        /// <returns>Einen Dateinamen</returns>
+        public static string GetFilenameFor(string name, string extension = null)
+        {
+            string filename = Regex.Replace(name, @"[/\<>]", "-");
+            filename = Regex.Replace(filename, @"['""]", "");
+            return Path.ChangeExtension(filename.Trim(), extension);
         }
 
     }

@@ -82,12 +82,13 @@
       <DependentUpon>ChartButlerDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="CServerConnection.cs" />
+    <Compile Include="CServerConnectionDFS.cs" />
     <Compile Include="CServerConnectionGAT24.cs" />
-    <Compile Include="CUpdateOverview.cs">
+    <Compile Include="dlgUpdateOverview.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CUpdateOverview.Designer.cs">
-      <DependentUpon>CUpdateOverview.cs</DependentUpon>
+    <Compile Include="dlgUpdateOverview.Designer.cs">
+      <DependentUpon>dlgUpdateOverview.cs</DependentUpon>
     </Compile>
     <Compile Include="dlgStatus.cs">
       <SubType>Form</SubType>
@@ -422,8 +423,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Utility.cs" />
-    <EmbeddedResource Include="CUpdateOverview.resx">
-      <DependentUpon>CUpdateOverview.cs</DependentUpon>
+    <EmbeddedResource Include="dlgUpdateOverview.resx">
+      <DependentUpon>dlgUpdateOverview.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgStatus.resx">
@@ -475,6 +476,7 @@
     <Content Include="Icon1.ico" />
     <Content Include="Icon1.png" />
     <Content Include="PdfSharp\PdfSharp.SharpZipLib\ReadMe.txt" />
+    <None Include="Resources\AiracUpdateInterval.ico" />
     <None Include="Resources\GAT24.jpg" />
     <None Include="Resources\DFS.png" />
   </ItemGroup>

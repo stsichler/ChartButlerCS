@@ -21,8 +21,8 @@ namespace ChartButlerCS
         public frmChartDB()
         {
             InitializeComponent();
-            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
-            cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
+
+            Settings.Default.Reload();
 
             // Alle SSL/TLS Protokolle außer TLS1.2 und höher global deaktivieren
 
@@ -47,6 +47,7 @@ namespace ChartButlerCS
             readDataBase();
             updateTreeView();
             updateUpdateRequiredPanel();
+            updateButtons();
 
             bool showMsgBox = false;
             bool showEula = false;
@@ -215,7 +216,7 @@ namespace ChartButlerCS
                     DateTime lastUpdate = chartButlerDataSet.AIP[0].LastUpdate;
                     int age = (DateTime.Now.Date - lastUpdate).Days;
 
-                    if (age >= Settings.Default.UpdateInterval)
+                    if (age >= Settings.Default.AiracUpdateInterval)
                     {
                         label_updateRequired.Text = "Die Karten wurden zuletzt vor " + age + " Tagen mit dem Server abgeglichen und sollten daher aktualisiert werden!";
                         panel_updateRequired.BackColor = Color.DarkRed;
@@ -236,6 +237,33 @@ namespace ChartButlerCS
             }
 
             PerformLayout();
+        }
+
+        private void updateButtons()
+        {
+            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0
+                && (Settings.Default.ServerUsername.Length > 0 || "DFS" == Settings.Default.DataSource);
+
+            cmdUpdateCharts.Enabled = cmdNewAF.Enabled && chartButlerDataSet.Airfields.Count != 0;
+
+            if ("DFS" == Settings.Default.DataSource)
+            {
+                label1.Visible = true;
+                pictureBox1.Image = Properties.Resources.DFS;
+                pictureBox1.Visible = true;
+            }
+            else if ("GAT24" == Settings.Default.DataSource)
+            {
+                label1.Visible = true;
+                pictureBox1.Image = Properties.Resources.GAT24;
+                pictureBox1.Visible = true;
+            }
+            else
+            {
+                label1.Visible = false;
+                pictureBox1.Visible = false;
+                pictureBox1.Image = null;
+            }
         }
 
         private void label_updateRequired_Click(object sender, EventArgs e)
@@ -272,7 +300,7 @@ namespace ChartButlerCS
             if (node != null && node.Tag != null && node.Tag.GetType() == typeof(ChartButlerDataSet.AFChartsRow))
             {
                 ChartButlerDataSet.AFChartsRow chrow = (ChartButlerDataSet.AFChartsRow)(node.Tag);
-                try { OpenFileInDefaultApp(BuildChartPdfPath(chrow)); }
+                try { OpenFileInDefaultApp(Utility.BuildChartPath(chrow)); }
                 catch (Exception) { }
             }
         }
@@ -300,7 +328,9 @@ namespace ChartButlerCS
             if (node != null && node.Tag != null && node.Tag.GetType() == typeof(ChartButlerDataSet.AFChartsRow))
             {
                 ChartButlerDataSet.AFChartsRow chrow = (ChartButlerDataSet.AFChartsRow)(node.Tag);
-                string previewPath = BuildChartPreviewJpgPath(chrow);
+                string previewPath = Utility.BuildChartPath(chrow);
+                if (!previewPath.EndsWith(".png"))
+                    previewPath = Utility.BuildChartPreviewPath(chrow, "jpg");
                 try
                 {
                     if (File.Exists(previewPath))
@@ -358,7 +388,7 @@ namespace ChartButlerCS
             return dialogResult;
         }
 
-        private void flugplatzLöschenToolStripMenuItem_Click(object sender, EventArgs e)
+        private void deleteFieldToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode node = treeView1.SelectedNode;
             if (node == null || node.Tag == null)
@@ -390,6 +420,7 @@ namespace ChartButlerCS
 
                     updateTreeView();
                     updateDataBase();
+                    updateButtons();
                 }
             }
         }
@@ -397,13 +428,13 @@ namespace ChartButlerCS
         private void cmdUpdateCharts_Click(object sender, EventArgs e)
         {
             CServerConnection cConn = new CServerConnection(this,chartButlerDataSet);            
-            clist = cConn.Establish(null);
+            clist = cConn.doUpdate(null);
             updateTreeView(); 
             updateDataBase();
             updateUpdateRequiredPanel();
             if (clist != null && clist.Count != 0)
             {
-                CUpdateOverview cupov = new CUpdateOverview(clist);
+                dlgUpdateOverview cupov = new dlgUpdateOverview(clist);
                 cupov.Show(this);
             }
         }
@@ -415,12 +446,12 @@ namespace ChartButlerCS
             if (res == System.Windows.Forms.DialogResult.OK)
             {
                 CServerConnection conn = new CServerConnection(this,chartButlerDataSet);
-                clist = conn.Establish(srchString);
+                clist = conn.doUpdate(srchString);
                 updateTreeView();
                 updateDataBase();
                 if (clist != null && clist.Count != 0)
                 {
-                    CUpdateOverview cupov = new CUpdateOverview(clist);
+                    dlgUpdateOverview cupov = new dlgUpdateOverview(clist);
                     cupov.Show(this);
                 }
             }
@@ -429,20 +460,26 @@ namespace ChartButlerCS
         private void cmdOptions_Click(object sender, EventArgs e)
         {
             frmOptions opts = new frmOptions();
+            string previous_chart_folder = (string)Settings.Default.ChartFolder.Clone();
             if (opts.ShowDialog(this) == DialogResult.OK)
             {
-                if (opts.m_ChartsPathChanged)
+                if (previous_chart_folder != Settings.Default.ChartFolder)
                     readDataBase();
                 updateTreeView();
             }
             updateUpdateRequiredPanel();
-
-            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0;
+            updateButtons();
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            try { OpenFileInDefaultApp("http://www.gat24.de"); }
+            try 
+            {
+                if ("DFS" == Settings.Default.DataSource)
+                    OpenFileInDefaultApp(Properties.Resources.DFS_BaseURL);
+                else if ("GAT24" == Settings.Default.DataSource)
+                    OpenFileInDefaultApp("http://www.gat24.de");
+            }
             catch (Exception) {}
         }
 
@@ -501,6 +538,16 @@ namespace ChartButlerCS
                             "Sie ChartButler danach neu!",
                             "ChartButler", MessageBoxButtons.OK);
                     }
+
+                    if (chartButlerDataSet.ChartButler.Count > 0)
+                    {
+                        Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
+                        if (null == Settings.Default.DataSource)
+                            Settings.Default.DataSource = "GAT24";
+                    }
+                    else
+                        Settings.Default.DataSource = null;
+
                 }
                 else
                     MessageBox.Show(this,
@@ -535,7 +582,7 @@ namespace ChartButlerCS
                         Console.WriteLine(ICAO + " -> Chart gefunden:" + strpChartName);
                         Console.WriteLine("Last Creation: " + File.GetLastWriteTime(fileName).Date);
                         ChartButlerDataSet.AFChartsRow chartRow = CheckChartInDb(ICAO, fileName);
-                        if (l_update_needed || !File.Exists(BuildChartPreviewJpgPath(chartRow)))
+                        if (l_update_needed || !File.Exists(Utility.BuildChartPreviewPath(chartRow, "jpg")))
                             l_update_needed= true;
                     }
                 }
@@ -559,8 +606,10 @@ namespace ChartButlerCS
         public void updateDataBase()
         {
             if (chartButlerDataSet.ChartButler.Count == 0)
-                chartButlerDataSet.ChartButler.AddChartButlerRow("");
-            chartButlerDataSet.ChartButler[0].Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                chartButlerDataSet.ChartButler.AddChartButlerRow("", "");
+            chartButlerDataSet.ChartButler[0].Version = 
+                System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            chartButlerDataSet.ChartButler[0].DataSource = Settings.Default.DataSource;
 
             if (Settings.Default.ChartFolder.Length > 0)
             {
@@ -610,15 +659,6 @@ namespace ChartButlerCS
                 chartButlerDataSet.AFCharts.AddAFChartsRow(rwChart);
             }
             return rwChart;
-        }
-
-        public static string BuildChartPdfPath(ChartButlerDataSet.AFChartsRow chartRow)
-        {
-            return Path.Combine(Path.Combine(Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), chartRow.Cname);
-        }
-        public static string BuildChartPreviewJpgPath(ChartButlerDataSet.AFChartsRow chartRow)
-        {
-            return Path.Combine(Path.Combine(Settings.Default.ChartFolder, chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), "." + chartRow.Cname + "_preview.jpg");
         }
 
         public static void OpenFileInDefaultApp(string path)

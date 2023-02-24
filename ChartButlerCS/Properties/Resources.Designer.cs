@@ -61,12 +61,58 @@ namespace ChartButlerCS.Properties {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Icon ähnlich wie (Symbol).
+        /// </summary>
+        internal static System.Drawing.Icon AiracUpdateInterval {
+            get {
+                object obj = ResourceManager.GetObject("AiracUpdateInterval", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap DFS {
             get {
                 object obj = ResourceManager.GetObject("DFS", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die https://aip.dfs.de/BasicVFR/ ähnelt.
+        /// </summary>
+        internal static string DFS_BaseURL {
+            get {
+                return ResourceManager.GetString("DFS_BaseURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die C0004A.html ähnelt.
+        /// </summary>
+        internal static string DFS_CopylinkAirfields {
+            get {
+                return ResourceManager.GetString("DFS_CopylinkAirfields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die https://aip.dfs.de/BasicVFR/pages/ ähnelt.
+        /// </summary>
+        internal static string DFS_CopylinkBaseURL {
+            get {
+                return ResourceManager.GetString("DFS_CopylinkBaseURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die C00001.html ähnelt.
+        /// </summary>
+        internal static string DFS_CopylinkMain {
+            get {
+                return ResourceManager.GetString("DFS_CopylinkMain", resourceCulture);
             }
         }
         

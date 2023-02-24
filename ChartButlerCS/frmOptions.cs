@@ -5,32 +5,30 @@ namespace ChartButlerCS
 {
     public partial class frmOptions : Form
     {
-        public bool m_ChartsPathChanged = false;
+        public Settings pending_settings;
 
         public frmOptions()
         {
             InitializeComponent();
 
-            txtChartPath.DataBindings.Add(new System.Windows.Forms.Binding("Text", ChartButlerCS.Settings.Default, "ChartFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            txtChartPath.Text = ChartButlerCS.Settings.Default.ChartFolder;
+            pending_settings = (Settings)Settings.Default.Clone();
 
-            txtUser.DataBindings.Add(new System.Windows.Forms.Binding("Text", ChartButlerCS.Settings.Default, "ServerUsername", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-            txtUser.Text = ChartButlerCS.Settings.Default.ServerUsername;
+            txtChartPath.DataBindings.Add(new System.Windows.Forms.Binding("Text", pending_settings, "ChartFolder", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            txtChartPath.Text = pending_settings.ChartFolder;
 
-            txtPW1.Enabled = chkSavePW.Checked;
-            txtPW2.Enabled = chkSavePW.Checked;
+            txtUser.DataBindings.Add(new System.Windows.Forms.Binding("Text", pending_settings, "ServerUsername", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+            txtUser.Text = pending_settings.ServerUsername;
         }
 
         private void cmdSearch_Click(object sender, EventArgs e)
         {
-            dlgChartFolder.SelectedPath = ChartButlerCS.Settings.Default.ChartFolder;
+            dlgChartFolder.SelectedPath = pending_settings.ChartFolder;
             if (dlgChartFolder.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if (dlgChartFolder.SelectedPath != ChartButlerCS.Settings.Default.ChartFolder)
+                if (dlgChartFolder.SelectedPath != pending_settings.ChartFolder)
                 {
                     txtChartPath.Text = dlgChartFolder.SelectedPath;
-                    ChartButlerCS.Settings.Default.ChartFolder = dlgChartFolder.SelectedPath;
-                    m_ChartsPathChanged = true;
+                    pending_settings.ChartFolder = dlgChartFolder.SelectedPath;
                 }
             }
         }
@@ -39,15 +37,16 @@ namespace ChartButlerCS
         {
             if (chkSavePW.Checked == false)
             {
-                Settings.Default.ServerPassword = null;
+                pending_settings.ServerPassword = null;
             }
             else if (txtPW1.Text == txtPW2.Text)
             {
-                Settings.Default.ServerPassword = txtPW1.Text;
+                pending_settings.ServerPassword = txtPW1.Text;
             }
             try
             {
-                Settings.Default.Save();
+                pending_settings.Save();
+                Settings.Default = pending_settings;
                 DialogResult = DialogResult.OK;
             }
             catch (Exception)
@@ -59,7 +58,6 @@ namespace ChartButlerCS
 
         private void cmdCancel_Click(object sender, EventArgs e)
         {
-            Settings.Default.Reload();
             DialogResult = DialogResult.Cancel;
         }
 
@@ -82,15 +80,32 @@ namespace ChartButlerCS
 
         private void frmOptions_Load(object sender, EventArgs e)
         {
-            if (Settings.Default.ServerPassword == null || Settings.Default.ServerPassword == "")
+
+            radioButtonDFS.Checked = ("DFS" == pending_settings.DataSource);
+            radioButtonGAT24.Checked = ("GAT24" == pending_settings.DataSource);
+
+            if (pending_settings.ServerPassword == null || pending_settings.ServerPassword == "")
             {
                 chkSavePW.Checked = false;
             }
             else
             {
                 chkSavePW.Checked = true;
-                txtPW1.Text = txtPW2.Text = Settings.Default.ServerPassword;
+                txtPW1.Text = txtPW2.Text = pending_settings.ServerPassword;
             }
+
+            txtPW1.Enabled = chkSavePW.Checked;
+            txtPW2.Enabled = chkSavePW.Checked;
+        }
+
+        private void radioButtonDFS_CheckedChanged(object sender, EventArgs e)
+        {
+            pending_settings.DataSource = "DFS";
+        }
+
+        private void radioButtonGAT24_CheckedChanged(object sender, EventArgs e)
+        {
+            pending_settings.DataSource = "GAT24";
         }
     }//end Class
 }//end NameSpace

@@ -630,7 +630,7 @@ namespace ChartButlerCS {
                 this.columnCname.Unique = true;
                 this.columnCname.MaxLength = 100;
                 this.columnCreationDate.AllowDBNull = false;
-                this.columnCrypt.MaxLength = 32;
+                this.columnCrypt.MaxLength = 100;
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1563,6 +1563,8 @@ namespace ChartButlerCS {
             
             private global::System.Data.DataColumn columnVersion;
             
+            private global::System.Data.DataColumn columnDataSource;
+            
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public ChartButlerDataTable() {
@@ -1606,6 +1608,14 @@ namespace ChartButlerCS {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public global::System.Data.DataColumn DataSourceColumn {
+                get {
+                    return this.columnDataSource;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             [global::System.ComponentModel.Browsable(false)]
             public int Count {
                 get {
@@ -1641,10 +1651,11 @@ namespace ChartButlerCS {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
-            public ChartButlerRow AddChartButlerRow(string Version) {
+            public ChartButlerRow AddChartButlerRow(string Version, string DataSource) {
                 ChartButlerRow rowChartButlerRow = ((ChartButlerRow)(this.NewRow()));
                 object[] columnValuesArray = new object[] {
-                        Version};
+                        Version,
+                        DataSource};
                 rowChartButlerRow.ItemArray = columnValuesArray;
                 this.Rows.Add(rowChartButlerRow);
                 return rowChartButlerRow;
@@ -1668,6 +1679,7 @@ namespace ChartButlerCS {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             internal void InitVars() {
                 this.columnVersion = base.Columns["Version"];
+                this.columnDataSource = base.Columns["DataSource"];
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -1675,6 +1687,8 @@ namespace ChartButlerCS {
             private void InitClass() {
                 this.columnVersion = new global::System.Data.DataColumn("Version", typeof(string), null, global::System.Data.MappingType.Element);
                 base.Columns.Add(this.columnVersion);
+                this.columnDataSource = new global::System.Data.DataColumn("DataSource", typeof(string), null, global::System.Data.MappingType.Element);
+                base.Columns.Add(this.columnDataSource);
             }
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -2137,6 +2151,22 @@ namespace ChartButlerCS {
             
             [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public string DataSource {
+                get {
+                    try {
+                        return ((string)(this[this.tableChartButler.DataSourceColumn]));
+                    }
+                    catch (global::System.InvalidCastException e) {
+                        throw new global::System.Data.StrongTypingException("Der Wert für Spalte DataSource in Tabelle ChartButler ist DBNull.", e);
+                    }
+                }
+                set {
+                    this[this.tableChartButler.DataSourceColumn] = value;
+                }
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public bool IsVersionNull() {
                 return this.IsNull(this.tableChartButler.VersionColumn);
             }
@@ -2145,6 +2175,18 @@ namespace ChartButlerCS {
             [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
             public void SetVersionNull() {
                 this[this.tableChartButler.VersionColumn] = global::System.Convert.DBNull;
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public bool IsDataSourceNull() {
+                return this.IsNull(this.tableChartButler.DataSourceColumn);
+            }
+            
+            [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+            [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")]
+            public void SetDataSourceNull() {
+                this[this.tableChartButler.DataSourceColumn] = global::System.Convert.DBNull;
             }
         }
         

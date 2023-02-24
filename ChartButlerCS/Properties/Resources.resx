@@ -121,6 +121,18 @@
   <data name="DFS" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DFS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="DFS_BaseURL" xml:space="preserve">
+    <value>https://aip.dfs.de/BasicVFR/</value>
+  </data>
+  <data name="DFS_CopylinkAirfields" xml:space="preserve">
+    <value>C0004A.html</value>
+  </data>
+  <data name="DFS_CopylinkBaseURL" xml:space="preserve">
+    <value>https://aip.dfs.de/BasicVFR/pages/</value>
+  </data>
+  <data name="DFS_CopylinkMain" xml:space="preserve">
+    <value>C00001.html</value>
+  </data>
   <data name="GAT24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\GAT24.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

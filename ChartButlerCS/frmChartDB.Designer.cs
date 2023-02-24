@@ -32,7 +32,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmChartDB));
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.flugplatzLöschenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteFieldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.previewPictureBox = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -79,16 +79,16 @@
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.flugplatzLöschenToolStripMenuItem});
+            this.deleteFieldToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(167, 26);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 48);
             // 
-            // flugplatzLöschenToolStripMenuItem
+            // deleteFieldToolStripMenuItem
             // 
-            this.flugplatzLöschenToolStripMenuItem.Name = "flugplatzLöschenToolStripMenuItem";
-            this.flugplatzLöschenToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this.flugplatzLöschenToolStripMenuItem.Text = "Flugplatz löschen";
-            this.flugplatzLöschenToolStripMenuItem.Click += new System.EventHandler(this.flugplatzLöschenToolStripMenuItem_Click);
+            this.deleteFieldToolStripMenuItem.Name = "deleteFieldToolStripMenuItem";
+            this.deleteFieldToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteFieldToolStripMenuItem.Text = "Flugplatz löschen";
+            this.deleteFieldToolStripMenuItem.Click += new System.EventHandler(this.deleteFieldToolStripMenuItem_Click);
             // 
             // splitContainer1
             // 
@@ -117,25 +117,25 @@
             this.previewPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.previewPictureBox.TabIndex = 0;
             this.previewPictureBox.TabStop = false;
-            this.toolTip1.SetToolTip(this.previewPictureBox, "Doppelklick, um Karte in einem PDF-Reader anzuzeigen/zu drucken.");
+            this.toolTip1.SetToolTip(this.previewPictureBox, "Doppelklick, um Karte in einer externen Anwendung anzuzeigen/zu drucken.");
             this.previewPictureBox.DoubleClick += new System.EventHandler(this.previewPictureBox_DoubleClick);
             // 
             // pictureBox1
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.pictureBox1.Image = global::ChartButlerCS.Properties.Resources.GAT24;
             this.pictureBox1.Location = new System.Drawing.Point(4, 146);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(222, 200);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox1.TabIndex = 14;
             this.pictureBox1.TabStop = false;
-            this.toolTip1.SetToolTip(this.pictureBox1, "Klicken, um GAT24.de zu öffnen.");
+            this.pictureBox1.Visible = false;
             this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // cmdNewAF
             // 
             this.cmdNewAF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdNewAF.Enabled = false;
             this.cmdNewAF.Location = new System.Drawing.Point(4, 4);
             this.cmdNewAF.Name = "cmdNewAF";
             this.cmdNewAF.Size = new System.Drawing.Size(222, 37);
@@ -147,6 +147,7 @@
             // cmdUpdateCharts
             // 
             this.cmdUpdateCharts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdUpdateCharts.Enabled = false;
             this.cmdUpdateCharts.Location = new System.Drawing.Point(4, 47);
             this.cmdUpdateCharts.Name = "cmdUpdateCharts";
             this.cmdUpdateCharts.Size = new System.Drawing.Size(222, 37);
@@ -199,6 +200,7 @@
             this.label1.TabIndex = 3;
             this.label1.Text = "Kartenmaterial von";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.Visible = false;
             // 
             // panel1
             // 
@@ -301,7 +303,7 @@
         private System.Windows.Forms.TreeView treeView1;
         private ChartButlerDataSet chartButlerDataSet;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem flugplatzLöschenToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deleteFieldToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.Button cmdNewAF;
