@@ -541,9 +541,10 @@ namespace ChartButlerCS
 
                     if (chartButlerDataSet.ChartButler.Count > 0)
                     {
-                        Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
-                        if (null == Settings.Default.DataSource)
+                        if (chartButlerDataSet.ChartButler[0].IsDataSourceNull())
                             Settings.Default.DataSource = "GAT24";
+                        else
+                            Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
                     }
                     else
                         Settings.Default.DataSource = null;
