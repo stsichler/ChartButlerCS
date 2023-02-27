@@ -1,0 +1,5 @@
+* text=auto
+*.cs text eol=crlf
+*.resx text eol=crlf
+app.config text eol=crlf
+
