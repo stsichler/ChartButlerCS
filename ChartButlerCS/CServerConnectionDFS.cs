@@ -43,7 +43,7 @@ namespace ChartButlerCS
 
         public struct DFS_ChartLink
         {
-            public string airfield_copylink;
+            public string airfield_permalink;
             public Uri document_link;
             public string name;
             public byte[] preview_data;
@@ -52,20 +52,28 @@ namespace ChartButlerCS
         /// <summary>
         /// Verbindet mit dem Server und sucht nach geänderten Karten.
         /// </summary>
-        private void DFS_ConnectionWorker(string newField, IntPtr dummy)
+        private void DFS_ConnectionWorker(string[] newFields, IntPtr dummy)
         {
             sts.Invoke((MethodInvoker)delegate {
-                sts.progressBar.Maximum = (newField != null) ? 6 : (2 + (chartButlerDataset.Airfields.Count * 4));
+                sts.progressBar.Maximum = (newFields != null && newFields.Length != 0) ? (newFields.Length * 6) : (2 + (chartButlerDataset.Airfields.Count * 4));
                 sts.txtProgress.AppendText("Verbinde zu DFS Server... "); });
 
             try
             {
-                string text = Utility.GetURLText2(httpClient, 
-                    new Uri(new Uri(Properties.Resources.DFS_CopylinkBaseURL), Properties.Resources.DFS_CopylinkMain));
+                DFS_MainURL = new Uri(new Uri(Properties.Resources.DFS_PermalinkBaseURL), Properties.Resources.DFS_PermalinkMain);
+                DFS_GetRedirectURLText(ref DFS_MainURL);
 
-                int pos = 0;
-                DFS_MainURL = new Uri(Utility.GetTextBetweenRegex(text, 
-                    new Regex(@"<meta\s+http-equiv=""Refresh""\s+content=""0;\s*url="), new Regex(@""""), ref pos));
+                sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
+
+                DFS_airac = DFS_ExtractAIRACFromURL(DFS_MainURL, ref Update);
+
+                if (DFS_airac == null)
+                {
+                    errorText = "Entschuldigung. " + Environment.NewLine
+                        + "Der AIRAC Date Code kann nicht abgerufen werden." + Environment.NewLine
+                        + "Es handelt sich um eine Inkompatibilität mit dem DFS Server.";
+                    return;
+                }
             }
             catch (Exception exc) 
             {
@@ -81,22 +89,12 @@ namespace ChartButlerCS
                 return;
             }
 
-            sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
-
-            DFS_airac = DFS_ExtractAIRACFromURL(DFS_MainURL, ref Update);
-            if (DFS_airac == null)
-            {
-                errorText = "Entschuldigung. " + Environment.NewLine
-                    + "Der AIRAC Date Code kann nicht abgerufen werden." + Environment.NewLine
-                    + "Es handelt sich um eine Inkompatibilität mit dem DFS Server.";
-                return;
-            }
-
             sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK. AIRAC: " + DFS_airac + Environment.NewLine); });
 
-            if (newField != null)
+            if (newFields != null)
             {
-                DFS_AddNewField(newField);
+                foreach(var field in newFields)
+                    DFS_AddNewField(field);
             }
             else
             {
@@ -187,9 +185,10 @@ namespace ChartButlerCS
                 Directory.CreateDirectory(newFieldICAO + " - " + FieldName);
                 try
                 {
+                    bool update_tripkit = true;
                     foreach (DFS_ChartLink cl in chartLinks)
                     {
-                        DFS_DownloadAndCheckChart(true, cl, afrow);
+                        DFS_DownloadAndCheckChart(true, cl, afrow, ref update_tripkit);
                         sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
                     }
                     DFS_UpdateTripKitCharts(true, afrow);
@@ -216,20 +215,13 @@ namespace ChartButlerCS
         }
 
         /// <summary>
-        /// Ruft die Seite der zuletzt geänderten Charts auf,
-        /// prüft, ob aus dem lokalen Bestand Charts betroffen sind
-        /// und sorgt für deren Update.
+        /// Überprüft, ob die vorhandenen Karten noch aktuell sind und aktualisiert diese gegebenenfalls.
         /// </summary>
         private void DFS_CheckForNewCharts()
         {
-/*            // Datum des letzten AIP Updates ermitteln
-            string htmlText = Utility.GetURLText(GAT24_InsertSID(Settings.Default.GAT24_ServerAmendedURL, GAT24_SID), ServerCertificateValidationCallback);
-            int pos = 0;
-            Update = DateTime.Parse(Utility.GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:", ref pos));
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte veröffentlichte AIP Berichtigung: " + Update.ToShortDateString() + Environment.NewLine); });
 
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte AIP Berichtigung auf GAT24: "+Update.ToShortDateString()+ Environment.NewLine); });
-
-            bool full_update_required = true;
+//            bool full_update_required = true;
             bool same_chartbutler_version = (chartButlerDataset.ChartButler.Count != 0 
                 && chartButlerDataset.ChartButler[0].Version == System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
@@ -237,20 +229,22 @@ namespace ChartButlerCS
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + Environment.NewLine); });
-                if ((Update - lastUpdate).Days == Settings.Default.AiracUpdateInterval && same_chartbutler_version)
-                    full_update_required = false;
+//                if ((Update - lastUpdate).Days == Settings.Default.AiracUpdateInterval && same_chartbutler_version)
+//                    full_update_required = false;
 
-                if (Update == lastUpdate && same_chartbutler_version)
-                {
-                    sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText(Environment.NewLine + "Keine Aktualisierung notwendig!" + Environment.NewLine);
-                        sts.progressBar.Value = sts.progressBar.Maximum; });
-                    System.Threading.Thread.Sleep(3000);
-                    return;
-                }
+                //if (Update == lastUpdate && same_chartbutler_version)
+                //{
+                //    sts.Invoke((MethodInvoker)delegate {
+                //        sts.txtProgress.AppendText(Environment.NewLine + "Keine Aktualisierung notwendig!" + Environment.NewLine);
+                //        sts.progressBar.Value = sts.progressBar.Maximum; });
+                //    System.Threading.Thread.Sleep(3000);
+                //    return;
+                //}
             }
 
-            if (full_update_required)
+            List<string> AFlist = new List<string>();
+
+//            if (full_update_required)
             {
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze... " + Environment.NewLine); });
 
@@ -258,7 +252,7 @@ namespace ChartButlerCS
                 for (int j = 0; j < d.Count; ++j)
                     AFlist.Add(d.Rows[j][d.ICAOColumn].ToString());
             }
-            else
+/*            else
             {
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe berichtigte Flugplätze... " + Environment.NewLine); });
 
@@ -271,71 +265,99 @@ namespace ChartButlerCS
                     AFlist.Add(Icao);
                 }
             }
+*/
             sts.Invoke((MethodInvoker)delegate {
                 sts.progressBar.Maximum = 2 + AFlist.Count * 4;
                 sts.progressBar.PerformStep(); });
 
-            GAT24_UpdateCharts(AFlist);
+            DFS_UpdateCharts(AFlist);
 
             if (chartButlerDataset.AIP.Count == 0)
                 chartButlerDataset.AIP.AddAIPRow(Update);
             else
                 chartButlerDataset.AIP[0].LastUpdate = Update;
-*/        }
+        }
 
-        /*       
-                /// <summary>
-                /// Prüft, ob die lokalen Karten den Karten auf dem Server entsprechen und ersetzt diese ggf.
-                /// </summary>
-                /// <param name="AFlist">Die Liste der amendierten Flugplätze.</param>
-                public void GAT24_UpdateCharts(List<string> AFlist)
+        /// <summary>
+        /// Prüft, ob die lokalen Karten den Karten auf dem Server entsprechen und ersetzt diese ggf.
+        /// </summary>
+        /// <param name="AFlist">Die Liste der amendierten Flugplätze.</param>
+        public void DFS_UpdateCharts(List<string> AFlist)
+        {
+            foreach (string ICAO in AFlist)
+            {
+                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe " + ICAO + "... "); });
+                ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(ICAO);
+                if (afrow != null)
                 {
-                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Scanne Airfields... " + Environment.NewLine); });
-                    foreach (string ICAO in AFlist)
+                    sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten... " + Environment.NewLine); });
+                    
+                    Uri AFSite = null;
+                    string airfield_permalink = null;
+                    if (afrow.GetAFChartsRows().Length > 0 && !String.IsNullOrEmpty(afrow.GetAFChartsRows()[0].Crypt))
                     {
-                        sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe " + ICAO + "... "); });
-                        ChartButlerDataSet.AirfieldsRow afrow = chartButlerDataset.Airfields.FindByICAO(ICAO);
-                        if (afrow != null)
-                        {
-                            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Prüfe Karten... " + Environment.NewLine); });
-                            string AFSite = ChartButlerCS.Settings.Default.GAT24_ServerAirFieldURL + ICAO + "&SID=" + GAT24_SID;
-                            string afresult = Utility.GetURLText(AFSite, ServerCertificateValidationCallback);
-                            LinkList = GAT24_GetChartLinks(afresult);
-                            sts.Invoke((MethodInvoker)delegate {
-                                sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + LinkList.Count;
-                                sts.progressBar.PerformStep(); });
-                            bool tripkit_needs_update = false;
-                            foreach (ChartLink cl in LinkList)
-                            {
-                                GAT24_DownloadAndCheckChart(false, cl, afrow, ref tripkit_needs_update);
-                                sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
-                            }
-                        }
-                        else
-                        {
-                            sts.Invoke((MethodInvoker)delegate {
-                                sts.txtProgress.AppendText("Nicht abonniert!" + Environment.NewLine);
-                                sts.progressBar.Value += 4; });
-                        }                                                
+                        airfield_permalink = afrow.GetAFChartsRows()[0].Crypt.Split(new char[] { '#' }, 2)[0];
+                        AFSite = 
+                            new Uri(new Uri(Properties.Resources.DFS_PermalinkBaseURL), airfield_permalink);
                     }
 
-                    sts.Invoke((MethodInvoker)delegate {
-                        sts.txtProgress.AppendText(Environment.NewLine + "Aktualisierung beendet." + Environment.NewLine);
-                        sts.progressBar.Value = sts.progressBar.Maximum; });
-                    System.Threading.Thread.Sleep(3000);
-                }
+                    if (AFSite == null)
+                    {
+                        string FieldName = null;
+                        AFSite = DFS_SearchField(ICAO, ref FieldName);
+                    }
 
-                /// <summary>
-                /// Sucht in einem HTML-Quelltext die erzeugte Session-ID.
-                /// </summary>
-                /// <param name="htmlStream">Der HTML-Quelltext, der durchsucht werden soll.</param>
-                /// <returns>Die Session-ID.</returns>
-                private string GAT24_GetSID(string htmlStream)
-                {
-                    int pos = 0;
-                    return Utility.GetTextBetween(htmlStream, "SID=", "\"", ref pos);
+                    if (AFSite != null)
+                    {
+                        List<DFS_ChartLink> chartLinks = DFS_GetChartLinks(AFSite);
+
+                        if (chartLinks.Count > 0 && chartLinks[0].airfield_permalink != airfield_permalink)
+                        {
+                            sts.txtProgress.AppendText("ACHTUNG: Der Permalink der Flugplatzes " + ICAO + " hat sich verändert!" + Environment.NewLine);
+                        }
+
+                        sts.Invoke((MethodInvoker)delegate
+                        {
+                            sts.progressBar.Maximum = sts.progressBar.Maximum - 3 + chartLinks.Count;
+                            sts.progressBar.PerformStep();
+                        });
+                        bool tripkit_needs_update = false;
+                        foreach (DFS_ChartLink cl in chartLinks)
+                        {
+                            DFS_DownloadAndCheckChart(false, cl, afrow, ref tripkit_needs_update);
+                            sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
+                        }
+
+                        // TODO: Karten aus Datenbank entfernen und löschen, die nicht mehr bereit gestellt werden.
+
+
+                        if (tripkit_needs_update)
+                            DFS_UpdateTripKitCharts(false, afrow);
+                    }
+                    else
+                    {
+                        errorText = "Flugplatz " + ICAO + " nicht gefunden!";
+                        return;
+                    }
                 }
-        */
+                else
+                {
+                    sts.Invoke((MethodInvoker)delegate
+                    {
+                        sts.txtProgress.AppendText("Nicht abonniert!" + Environment.NewLine);
+                        sts.progressBar.Value += 4;
+                    });
+                }
+            }
+
+            sts.Invoke((MethodInvoker)delegate
+            {
+                sts.txtProgress.AppendText(Environment.NewLine + "Aktualisierung beendet." + Environment.NewLine);
+                sts.progressBar.Value = sts.progressBar.Maximum;
+            });
+            System.Threading.Thread.Sleep(3000);
+        }
+
         /// <summary>
         /// Stellt die Liste der Download-Links für alle Charts eines Flugplatzes bereit.
         /// </summary>
@@ -343,16 +365,16 @@ namespace ChartButlerCS
         /// <returns>Eine Liste mit den Download-Links</returns>
         private List<DFS_ChartLink> DFS_GetChartLinks(Uri AFSite)
         {
-            string AFstream = Utility.GetURLText2(httpClient, AFSite);
+            string AFstream = DFS_GetRedirectURLText(ref AFSite);
 
-            // Copylink extrahieren
+            // Permalink extrahieren
 
             int pos = 0;
-            string copylink = Utility.GetTextBetweenRegex(AFstream, 
-                new Regex(@"<input\s+class=""copylink""\s+value="""), new Regex(@""""), ref pos);
+            string permalink = Utility.GetTextBetweenRegex(AFstream, 
+                new Regex(@"const\smyPermalink\s=\s"""), new Regex(@""""), ref pos);
 
-            string[] copylink_segments = new Uri(copylink).Segments;
-            copylink = copylink_segments[copylink_segments.Length - 1];
+            string[] permalink_segments = permalink.Split(new char[] { '/' });
+            permalink = permalink_segments[permalink_segments.Length - 1];
 
             // Chart Links extrahieren
 
@@ -394,7 +416,7 @@ namespace ChartButlerCS
                     if (name != null)
                     {
                         DFS_ChartLink lnk = new DFS_ChartLink();
-                        lnk.airfield_copylink = copylink;
+                        lnk.airfield_permalink = permalink;
                         lnk.document_link = new Uri(AFSite, href);
                         lnk.name = name;
                         lnk.preview_data = (preview_base64 != null) ? Convert.FromBase64String(preview_base64) : null;
@@ -414,7 +436,7 @@ namespace ChartButlerCS
         /// <param name="chartLink">Der Download-Link zur Karte.</param>
         /// <param name="afrow">Der Datenbankeintrag des Flugplatzes</param>
         /// <returns>True, falls die Karte neu angelegt oder ersetzt wurde.</returns>
-        private bool DFS_DownloadAndCheckChart(bool init, DFS_ChartLink chartLink, ChartButlerDataSet.AirfieldsRow afrow)
+        private bool DFS_DownloadAndCheckChart(bool init, DFS_ChartLink chartLink, ChartButlerDataSet.AirfieldsRow afrow, ref bool tripkit_needs_update)
         {
             string tmpPreviewPath = Path.GetTempFileName();
             string tmpChartPath = Path.GetTempFileName();
@@ -426,7 +448,7 @@ namespace ChartButlerCS
 
                 BindingSource bsCH = new BindingSource(chartButlerDataset, "AFcharts");
                 bsCH.Position = 0;
-                int tpos = init ? -1 : bsCH.Find("Crypt", chartLink.airfield_copylink + "#" + chartLink.name);
+                int tpos = init ? -1 : bsCH.Find("Crypt", chartLink.airfield_permalink + "#" + chartLink.name);
 
                 if (tpos != -1)
                 {
@@ -455,7 +477,7 @@ namespace ChartButlerCS
                         bsCH.Position = tpos;
                         chartRow = (ChartButlerDataSet.AFChartsRow)((System.Data.DataRowView)bsCH.Current).Row;
                     }
-                    chartRow.Crypt = chartLink.airfield_copylink + "#" + chartLink.name;
+                    chartRow.Crypt = chartLink.airfield_permalink + "#" + chartLink.name;
                 }
 
                 File.WriteAllBytes(tmpPreviewPath, chartLink.preview_data);
@@ -470,6 +492,8 @@ namespace ChartButlerCS
                 }
                 else
                 {
+                    tripkit_needs_update = true;
+
                     if (is_new_chart)
                         sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("wird hinzugefügt... "); });
                     else
@@ -536,18 +560,11 @@ namespace ChartButlerCS
         {
             string text = Utility.GetURLText2(httpClient, URL);
 
-            // Copylink extrahieren (im Moment nicht benötigt)
-
-            int pos = 0;
-            //string copylink = Utility.GetTextBetweenRegex(text,
-            //    new Regex(@"<input\s+class=""copylink""\s+value="""), new Regex(@""""), ref pos);
-
-            //string[] copylink_segments = new Uri(copylink).Segments;
-            //copylink = copylink_segments[copylink_segments.Length - 1];
+            // Hinweis: Permalink extrahieren wird im Moment nicht benötigt
 
             // Datum des Dokuments extrahieren
 
-            pos = 0;
+            int pos = 0;
             string date_string = Utility.GetTextBetweenRegex(text,
                 new Regex(@"<div\sclass=""headlineText float-end"">"), new Regex("</div>"), ref pos);
 
@@ -725,9 +742,9 @@ namespace ChartButlerCS
         }
 
         /// <summary>
-        /// Ruft eine Seite ab, die per Refresh meta tag weiter geleitet wird.
+        /// Ruft eine Seite ab, die ggf. per Refresh meta tag weiter geleitet wird.
         /// </summary>
-        /// <param name="uri">Die abzurufende (copylink) URL. Die URI wird auf die Weiterleitung gesetzt</param>
+        /// <param name="uri">Die abzurufende (Permalink) URL. Die URI wird auf die Weiterleitung gesetzt</param>
         /// <returns>Der HTML Text der Zielseite</returns>
         public string DFS_GetRedirectURLText(ref Uri uri)
         {
@@ -772,7 +789,7 @@ namespace ChartButlerCS
             {
                 // Flugplatzliste holen
 
-                Uri AirfieldsUri = new Uri(Properties.Resources.DFS_CopylinkBaseURL + Properties.Resources.DFS_CopylinkAirfields);
+                Uri AirfieldsUri = new Uri(Properties.Resources.DFS_PermalinkBaseURL + Properties.Resources.DFS_PermalinkAirfields);
                 string text = DFS_GetRedirectURLText(ref AirfieldsUri);
 
                 MatchCollection page_matches = Regex.Matches(text,

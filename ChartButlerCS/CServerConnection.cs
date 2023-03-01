@@ -100,10 +100,10 @@ namespace ChartButlerCS
         }
 
         /// <summary>
-        /// Aktualisiert die Flugplatzdatenbank durch Daten vom Server oder fügt einen neuen Flugplatz hinzu.
+        /// Aktualisiert die Flugplatzdatenbank durch Daten vom Server oder fügt neue Flugplätze hinzu.
         /// </summary>
-        /// <param name="newField">Der ICAO Code eines neu hinzu zu fügenden Flugplatzes oder null, falls alle Karten aktualisiert werden sollen.</param>
-        public List<CChart> doUpdate(string newField = null)
+        /// <param name="newFields">Die ICAO Codes neu hinzu zu fügender Flugplätze oder null, falls alle Karten aktualisiert werden sollen.</param>
+        public List<CChart> doUpdate(string[] newFields = null)
         {
             sts.CreateControl();
             IntPtr dummy = sts.Handle; // sicherstellen, dass das Fensterhandle vor Threadbeginn existiert
@@ -112,9 +112,9 @@ namespace ChartButlerCS
                    try
                    {
                        if ("DFS" == Settings.Default.DataSource)
-                           DFS_ConnectionWorker(newField, dummy);
+                           DFS_ConnectionWorker(newFields, dummy);
                        else if ("GAT24" == Settings.Default.DataSource)
-                           GAT24_ConnectionWorker(newField, dummy);
+                           GAT24_ConnectionWorker(newFields, dummy);
                    }
                    catch (Exception exc)
                    {

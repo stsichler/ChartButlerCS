@@ -195,9 +195,6 @@ namespace ChartButlerCS
                 }
             }
             treeView1.ResumeLayout();
-
-            cmdUpdateCharts.Enabled = Settings.Default.ChartFolder.Length > 0 && Settings.Default.ServerUsername.Length > 0
-                && chartButlerDataSet.Airfields.Count > 0;
         }
 
         private void updateUpdateRequiredPanel()
@@ -446,7 +443,7 @@ namespace ChartButlerCS
             if (res == System.Windows.Forms.DialogResult.OK)
             {
                 CServerConnection conn = new CServerConnection(this,chartButlerDataSet);
-                clist = conn.doUpdate(srchString);
+                clist = conn.doUpdate(new string[] { srchString });
                 updateTreeView();
                 updateDataBase();
                 if (clist != null && clist.Count != 0)
@@ -454,6 +451,7 @@ namespace ChartButlerCS
                     dlgUpdateOverview cupov = new dlgUpdateOverview(clist);
                     cupov.Show(this);
                 }
+                updateButtons();
             }
         }
 

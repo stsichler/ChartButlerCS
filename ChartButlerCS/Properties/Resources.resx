@@ -124,13 +124,13 @@
   <data name="DFS_BaseURL" xml:space="preserve">
     <value>https://aip.dfs.de/BasicVFR/</value>
   </data>
-  <data name="DFS_CopylinkAirfields" xml:space="preserve">
+  <data name="DFS_PermalinkAirfields" xml:space="preserve">
     <value>C0004A.html</value>
   </data>
-  <data name="DFS_CopylinkBaseURL" xml:space="preserve">
+  <data name="DFS_PermalinkBaseURL" xml:space="preserve">
     <value>https://aip.dfs.de/BasicVFR/pages/</value>
   </data>
-  <data name="DFS_CopylinkMain" xml:space="preserve">
+  <data name="DFS_PermalinkMain" xml:space="preserve">
     <value>C00001.html</value>
   </data>
   <data name="GAT24" type="System.Resources.ResXFileRef, System.Windows.Forms">

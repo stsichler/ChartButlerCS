@@ -28,10 +28,10 @@ namespace ChartButlerCS
         /// <summary>
         /// Verbindet mit den hinterlegten Login-Daten zum Server und sucht nach geänderten Karten.
         /// </summary>
-        private void GAT24_ConnectionWorker(string newField, IntPtr dummy)
+        private void GAT24_ConnectionWorker(string[] newFields, IntPtr dummy)
         {
             sts.Invoke((MethodInvoker)delegate {
-                sts.progressBar.Maximum = (newField != null) ? 6 : (2 + (chartButlerDataset.Airfields.Count * 4));
+                sts.progressBar.Maximum = (newFields != null && newFields.Length != 0) ? (newFields.Length * 6) : (2 + (chartButlerDataset.Airfields.Count * 4));
                 sts.txtProgress.AppendText("Verbinde zu GAT24 Server..."); });
             string pw = null;
             if (Settings.Default.ServerPassword == null || Settings.Default.ServerPassword == "")
@@ -85,9 +85,10 @@ namespace ChartButlerCS
             }
             sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK." + Environment.NewLine); });
 
-            if (newField != null)
+            if (newFields != null)
             {
-                GAT24_AddNewField(newField);
+                foreach( var field in newFields )
+                    GAT24_AddNewField(field);
             }
             else
             {

@@ -82,27 +82,27 @@ namespace ChartButlerCS.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die C0004A.html ähnelt.
         /// </summary>
-        internal static string DFS_CopylinkAirfields {
+        internal static string DFS_PermalinkAirfields {
             get {
-                return ResourceManager.GetString("DFS_CopylinkAirfields", resourceCulture);
+                return ResourceManager.GetString("DFS_PermalinkAirfields", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die https://aip.dfs.de/BasicVFR/pages/ ähnelt.
         /// </summary>
-        internal static string DFS_CopylinkBaseURL {
+        internal static string DFS_PermalinkBaseURL {
             get {
-                return ResourceManager.GetString("DFS_CopylinkBaseURL", resourceCulture);
+                return ResourceManager.GetString("DFS_PermalinkBaseURL", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die C00001.html ähnelt.
         /// </summary>
-        internal static string DFS_CopylinkMain {
+        internal static string DFS_PermalinkMain {
             get {
-                return ResourceManager.GetString("DFS_CopylinkMain", resourceCulture);
+                return ResourceManager.GetString("DFS_PermalinkMain", resourceCulture);
             }
         }
         
