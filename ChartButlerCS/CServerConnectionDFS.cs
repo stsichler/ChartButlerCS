@@ -61,13 +61,17 @@ namespace ChartButlerCS
             try
             {
                 DFS_MainURL = new Uri(new Uri(Properties.Resources.DFS_PermalinkBaseURL), Properties.Resources.DFS_PermalinkMain);
-                DFS_GetRedirectURLText(ref DFS_MainURL);
+                string text = DFS_GetRedirectURLText2(ref DFS_MainURL);
 
                 sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
 
-                DFS_airac = DFS_ExtractAIRACFromURL(DFS_MainURL, ref Update);
-
-                if (DFS_airac == null)
+                int pos = 0;
+                DFS_airac = Utility.GetTextBetweenRegex(text, new Regex(@"<span\s+class=""expand-header"">Effective:\s+</span>"), new Regex(@"[\r\n\s]*</div>"), ref pos);
+                if (!string.IsNullOrEmpty(DFS_airac))
+                {
+                    Update = DFS_CreateDateFromString(DFS_airac);
+                }
+                if (string.IsNullOrEmpty(DFS_airac) || Update == new DateTime())
                 {
                     errorText = "Entschuldigung. " + Environment.NewLine
                         + "Der AIRAC Date Code kann nicht abgerufen werden." + Environment.NewLine
@@ -89,7 +93,7 @@ namespace ChartButlerCS
                 return;
             }
 
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK. AIRAC: " + DFS_airac + Environment.NewLine); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK. Effective Date: " + DFS_airac + Environment.NewLine); });
 
             if (newFields != null)
             {
@@ -103,35 +107,34 @@ namespace ChartButlerCS
         }
 
         /// <summary>
-        /// Extrahiert einen AIRAC Date String der Form JJJJMONTT (z.B. 2023JAN16) aus einer URL 
-        /// und konvertiert ihn in ein DateTime Objekt.
+        /// Erzeugt ein DateTime von einem Date String der Form "TT MMM JJJJ", z.B. "02 FEB 2023".
+        /// Falls der dateString nicht als Datum erkannt wird, wird eine leere DateTime Instanz zurück gegeben.
         /// </summary>
-        /// <param name="URL">Die URL, die den AIRAC Date String enthält</param>
-        /// <param name="airacDate">Die DateTime Instanz, die überschrieben werden soll</param>
-        /// <returns>Der AIRAC Date String, falls er gefunden wurde oder null.</returns>
-        private string DFS_ExtractAIRACFromURL(Uri URL, ref DateTime airacDate)
+        /// <param name="dateString">Der String, der in ein DateTime gewandelt werden soll</param>
+        /// <returns></returns>
+        public static DateTime DFS_CreateDateFromString(string dateString)
         {
-            Match m = Regex.Match(URL.ToString(),
-                    @".*/((\d{4})((JAN)|(FEB)|(MAR)|(APR)|(MAY)|(JUN)|(JUL)|(AUG)|(SEP)|(OCT)|(NOV)|(DEC))(\d{2}))/.*"); 
+            DateTime date = new DateTime();
+
+            Match m = Regex.Match(dateString,
+                     @"(\d{2})\s+((JAN)|(FEB)|(MAR)|(APR)|(MAY)|(JUN)|(JUL)|(AUG)|(SEP)|(OCT)|(NOV)|(DEC))\s+(\d{4})");
             if (m.Success)
             {
-                // capture group [2]: year
-                int year = int.Parse(m.Groups[2].Value);
+                // capture group [1]: day
+                int day = int.Parse(m.Groups[1].Value);
 
-                // capture groups [4]-[15]: months
+                // capture groups [3]-[14]: months
                 int month = 1;
-                while (!m.Groups[month + 3].Success)
+                while (!m.Groups[month + 2].Success)
                     ++month;
 
-                // capture group [16]: day
-                int day = int.Parse(m.Groups[16].Value);
+                // capture group [15]: yeat
+                int year = int.Parse(m.Groups[15].Value);
 
-                airacDate = new DateTime(year, month, day);
-                
-                // capture group [1]: AIRAC string
-                return m.Groups[1].Value;
+                date = new DateTime(year, month, day);
             }
-            return null;
+
+            return date;
         }
 
         /// <summary>
@@ -328,8 +331,7 @@ namespace ChartButlerCS
                             sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
                         }
 
-                        // TODO: Karten aus Datenbank entfernen und löschen, die nicht mehr bereit gestellt werden.
-
+                        DFS_RemoveOrphanCharts(afrow, chartLinks, ref tripkit_needs_update);
 
                         if (tripkit_needs_update)
                             DFS_UpdateTripKitCharts(false, afrow);
@@ -359,13 +361,53 @@ namespace ChartButlerCS
         }
 
         /// <summary>
+        /// Entfernt Karten, die nicht mehr auf dem DFS Server bereit gestellt werden, aus der Datenbank und löscht diese aus dem Kartenverzeichnis.
+        /// </summary>
+        /// <param name="afrow">Der Datenbankeintrag des FLugplatzes</param>
+        /// <param name="chartLinks">Die von DFS_GetCHartsLinks() ermittelten Karten auf dem DFS Server</param>
+        /// <param name="tripkit_needs_update">wird auf wahr gesetzt, falls der Kartensatz verändert wird</param>
+        public void DFS_RemoveOrphanCharts(ChartButlerDataSet.AirfieldsRow afrow, List<DFS_ChartLink> chartLinks, ref bool tripkit_needs_update)
+        {
+            for (int i = 0; i < afrow.GetAFChartsRows().Length;)
+            {
+                ChartButlerDataSet.AFChartsRow chartRow = afrow.GetAFChartsRows()[i];
+                // Hinweis: Das TripKit hat keinen "Crypt" Eintrag, d.h. keine Verlinkung auf den Server.
+                // -> es wird hier übersprungen
+                if (!chartRow.IsCryptNull())
+                {
+                    string chartName = chartRow.Crypt.Split(new char[] { '#' })[1];
+                    bool found = false;
+                    foreach (DFS_ChartLink cl in chartLinks)
+                        if (cl.name == chartName)
+                            found = true;
+                    if (!found)
+                    {
+                        string chartPath = Utility.BuildChartPath(chartRow);
+                        string previewPath = Utility.BuildChartPreviewPath(chartRow, "png");
+                        if (File.Exists(chartPath))
+                            File.Delete(chartPath);
+                        if (File.Exists(previewPath))
+                            File.Delete(previewPath);
+
+                        chartButlerDataset.AFCharts.RemoveAFChartsRow(chartRow);
+                        tripkit_needs_update = true;
+                    }
+                    else
+                        ++i;
+                }
+                else
+                    ++i;
+            }
+        }
+
+        /// <summary>
         /// Stellt die Liste der Download-Links für alle Charts eines Flugplatzes bereit.
         /// </summary>
         /// <param name="AFSite">Die URL der Flugplatz Seite</param>
         /// <returns>Eine Liste mit den Download-Links</returns>
         private List<DFS_ChartLink> DFS_GetChartLinks(Uri AFSite)
         {
-            string AFstream = DFS_GetRedirectURLText(ref AFSite);
+            string AFstream = DFS_GetRedirectURLText2(ref AFSite);
 
             // Permalink extrahieren
 
@@ -570,25 +612,7 @@ namespace ChartButlerCS
 
             DateTime date = new DateTime();
             if (pos != -1)
-            {
-                Match m = Regex.Match(date_string,
-                         @"(\d{2})\s+((JAN)|(FEB)|(MAR)|(APR)|(MAY)|(JUN)|(JUL)|(AUG)|(SEP)|(OCT)|(NOV)|(DEC))\s+(\d{4})");
-                if (m.Success)
-                {
-                    // capture group [1]: day
-                    int day = int.Parse(m.Groups[1].Value);
-
-                    // capture groups [3]-[14]: months
-                    int month = 1;
-                    while (!m.Groups[month + 2].Success)
-                        ++month;
-
-                    // capture group [15]: yeat
-                    int year = int.Parse(m.Groups[15].Value);
-
-                    date = new DateTime(year, month, day);
-                }
-            }
+                date = DFS_CreateDateFromString(date_string);
 
             // die eigentlichen Daten des Dokuments (das PNG Bild) extrahieren
 
@@ -746,7 +770,7 @@ namespace ChartButlerCS
         /// </summary>
         /// <param name="uri">Die abzurufende (Permalink) URL. Die URI wird auf die Weiterleitung gesetzt</param>
         /// <returns>Der HTML Text der Zielseite</returns>
-        public string DFS_GetRedirectURLText(ref Uri uri)
+        public string DFS_GetRedirectURLText2(ref Uri uri)
         {
             string text = Utility.GetURLText2(httpClient, uri);
             int pos = 0;
@@ -790,7 +814,7 @@ namespace ChartButlerCS
                 // Flugplatzliste holen
 
                 Uri AirfieldsUri = new Uri(Properties.Resources.DFS_PermalinkBaseURL + Properties.Resources.DFS_PermalinkAirfields);
-                string text = DFS_GetRedirectURLText(ref AirfieldsUri);
+                string text = DFS_GetRedirectURLText2(ref AirfieldsUri);
 
                 MatchCollection page_matches = Regex.Matches(text,
                     @"<a\s+class=""folder-link""\s+href=""([^""]*)""\s*>\s*<span\s+lang=""de""\s+class=""folder-name"">([A-Z](-[A-Z])?)\s*</span>");
