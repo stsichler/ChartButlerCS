@@ -123,7 +123,7 @@ namespace ChartButlerCS
         /// <param name="StopRegex">Der abschließende reguläre Ausdruck.</param>
         /// <param name="StartAtPos">Der Startpunkt. Er wird auf die Position nach dem abschließenden Ausdruck erhöht 
         /// oder auf -1 gesetzt, falls kein Fund vorliegt.</param>
-        /// <returns>Die gefundene Zeichenkette.</returns>
+        /// <returns>Die gefundene Zeichenkette oder string.Empty, falls kein Match gefunden werden konnte.</returns>
         public static string GetTextBetweenRegex(string ContainingText, Regex StartRegex, Regex StopRegex, ref int StartAtPos)
         {
             string result = string.Empty;

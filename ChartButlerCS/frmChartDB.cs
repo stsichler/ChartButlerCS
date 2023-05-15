@@ -74,17 +74,18 @@ namespace ChartButlerCS
                     Environment.NewLine;
             }
 
-            if (Settings.Default.ChartFolder.Length == 0 && Settings.Default.ServerUsername.Length == 0 
-                && chartButlerDataSet.Airfields.Count == 0)
+            if (Settings.Default.ChartFolder.Length == 0 && chartButlerDataSet.Airfields.Count == 0)
             {
                 showMsgBox = true;
                 showOptions = true;
-                text += 
-                    "Zur Benutzung dieser Software wird ein GAT24 Benutzerkonto benötigt." + Environment.NewLine +
-                    Environment.NewLine +
+                text +=
                     "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis " +
                     "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie " +
-                    "Ihre GAT24-Zugangsdaten ein." + Environment.NewLine;
+                    "EuroGAT24-Zugangsdaten ein, falls Sie diese besitzen." + Environment.NewLine +
+                    Environment.NewLine +
+                    "Falls Sie kein EuroGAT24 Konto besitzen, können die AIP-Charts auch alternativ " +
+                    "von der kostenfreien BasicVFR AIP Veröffentlichung der DFS geladen werden." +
+                    Environment.NewLine;
                 }
 
             if (showMsgBox)
@@ -494,7 +495,7 @@ namespace ChartButlerCS
         public void readDataBase()
         {
             chartButlerDataSet.Clear();
-            string windowTitle = "ChartButler(C) 2020 Jörg Pauly / Stefan Sichler";
+            string windowTitle = "ChartButler(C) 2020-2023 Jörg Pauly / Stefan Sichler";
 
             if (Settings.Default.ChartFolder.Length > 0)
             {
@@ -581,8 +582,20 @@ namespace ChartButlerCS
                         Console.WriteLine(ICAO + " -> Chart gefunden:" + strpChartName);
                         Console.WriteLine("Last Creation: " + File.GetLastWriteTime(fileName).Date);
                         ChartButlerDataSet.AFChartsRow chartRow = CheckChartInDb(ICAO, fileName);
-                        if (l_update_needed || !File.Exists(Utility.BuildChartPreviewPath(chartRow, "jpg")))
+                        if (!File.Exists(Utility.BuildChartPreviewPath(chartRow, "jpg")))
                             l_update_needed= true;
+                    }
+                    if (Path.GetExtension(fileName).ToLower() == ".png")
+                    {
+                        string strpChartName = Path.GetFileName(fileName);
+                        if (!strpChartName.EndsWith("_preview.png"))
+                        {
+                            Console.WriteLine(ICAO + " -> Chart gefunden:" + strpChartName);
+                            Console.WriteLine("Last Creation: " + File.GetLastWriteTime(fileName).Date);
+                            ChartButlerDataSet.AFChartsRow chartRow = CheckChartInDb(ICAO, fileName);
+                            if (!File.Exists(Utility.BuildChartPreviewPath(chartRow, "png")))
+                                l_update_needed = true;
+                        }
                     }
                 }
             }

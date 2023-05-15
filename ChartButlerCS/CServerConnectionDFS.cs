@@ -27,9 +27,10 @@ namespace ChartButlerCS
         public struct DFSAirfieldsCache
         {
             /// <summary>
-            ///  Airac DateString der AIP, aus der der Cache extrahiert wurde
+            /// Die Main URL (aufgelöste URL des Permalinks zur BasicVFR Hauptseite), aus der der Cache extrahiert wurde.
+            /// siehe DFS_MainURL
             /// </summary>
-            public string airac;
+            public string mainURL;
             /// <summary>
             /// Liste der Flugplätze und URLs ihrer Übersichtsseiten
             /// </summary>
@@ -93,7 +94,7 @@ namespace ChartButlerCS
                 return;
             }
 
-            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK. Effective Date: " + DFS_airac + Environment.NewLine); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("OK. Effective: " + DFS_airac + Environment.NewLine); });
 
             if (newFields != null)
             {
@@ -297,7 +298,7 @@ namespace ChartButlerCS
                     
                     Uri AFSite = null;
                     string airfield_permalink = null;
-                    if (afrow.GetAFChartsRows().Length > 0 && !String.IsNullOrEmpty(afrow.GetAFChartsRows()[0].Crypt))
+                    if (afrow.GetAFChartsRows().Length > 0 && !afrow.GetAFChartsRows()[0].IsCryptNull())
                     {
                         airfield_permalink = afrow.GetAFChartsRows()[0].Crypt.Split(new char[] { '#' }, 2)[0];
                         AFSite = 
@@ -316,7 +317,10 @@ namespace ChartButlerCS
 
                         if (chartLinks.Count > 0 && chartLinks[0].airfield_permalink != airfield_permalink)
                         {
-                            sts.txtProgress.AppendText("ACHTUNG: Der Permalink der Flugplatzes " + ICAO + " hat sich verändert!" + Environment.NewLine);
+                            sts.Invoke((MethodInvoker)delegate
+                            {
+                                sts.txtProgress.AppendText("ACHTUNG: Der Permalink der Flugplatzes " + ICAO + " hat sich verändert!" + Environment.NewLine);
+                            });
                         }
 
                         sts.Invoke((MethodInvoker)delegate
@@ -501,7 +505,7 @@ namespace ChartButlerCS
                 }
                 else
                 {
-                    string Cname = Path.ChangeExtension(Utility.GetFilenameFor(chartLink.name), "png");
+                    string Cname = Utility.GetFilenameFor(chartLink.name, "png");
 
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(Cname + "... "); });
 
@@ -795,7 +799,7 @@ namespace ChartButlerCS
         {
             // zuerst versuchen Cache File zu laden
 
-            if (DFS_airfields_cache.airac == null)
+            if (DFS_airfields_cache.mainURL == null)
             {
                 try
                 {
@@ -809,7 +813,7 @@ namespace ChartButlerCS
                 { }
             }
 
-            if (DFS_airac != DFS_airfields_cache.airac)
+            if (DFS_MainURL.ToString() != DFS_airfields_cache.mainURL)
             {
                 // Flugplatzliste holen
 
@@ -837,7 +841,7 @@ namespace ChartButlerCS
                         string airfield_href = airfield_match.Groups[1].Value;
                         string airfield = airfield_match.Groups[2].Value;
 
-                        // make airfield href link relative to DFS_MainURL
+                        // Flugplatz href Link zum relativen Link zur DFS_MainURL konvertieren
                         Uri airfield_uri = new Uri(AirfieldsUri, airfield_href);
                         airfield_href = DFS_MainURL.MakeRelativeUri(airfield_uri).ToString();
 
@@ -849,7 +853,7 @@ namespace ChartButlerCS
 
                 // im Cache File ablegen
 
-                DFS_airfields_cache.airac = DFS_airac;
+                DFS_airfields_cache.mainURL = DFS_MainURL.ToString();
                 DFS_airfields_cache.airfields = airfields;
                 try
                 {

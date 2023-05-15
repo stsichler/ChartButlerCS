@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die mit einer Assembly verknüpft sind.
 [assembly: AssemblyTitle("ChartButler")]
-[assembly: AssemblyDescription("AIP-Charts von GAT24.de einfach nutzen und aktuell halten")]
+[assembly: AssemblyDescription("AIP-Charts von EuroGAT24 oder von der BasicVFR der DFS einfach nutzen und aktuell halten")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Stefan Sichler")]
 [assembly: AssemblyProduct("ChartButler")]
-[assembly: AssemblyCopyright("Copyright © 2017-2022 Stefan Sichler")]
+[assembly: AssemblyCopyright("Copyright © 2017-2023 Stefan Sichler")]
 [assembly: AssemblyTrademark("ChartButler")]
 [assembly: AssemblyCulture("")]
 
