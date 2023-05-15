@@ -2,7 +2,7 @@
 
 [**> Aktuelle Version hier herunterladen <**](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
-[![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/total?style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
+[![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/latest/total?label=Downloads&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 [<img src="https://www.paypalobjects.com/de_DE/DE/i/btn/btn_donate_LG.gif" align="right" />](https://www.paypal.com/donate/?hosted_button_id=3QJRLMM3CAWKS)
 
 <sup>[Unterschiede zur Vorgängerversion auf GitHub nachlesen](https://github.com/stsichler/ChartButlerCS/releases)</sup>
