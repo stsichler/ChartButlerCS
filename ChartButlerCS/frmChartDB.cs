@@ -464,6 +464,24 @@ namespace ChartButlerCS
             {
                 if (previous_chart_folder != Settings.Default.ChartFolder)
                     readDataBase();
+                else if (chartButlerDataSet.ChartButler.Count > 0 && !chartButlerDataSet.ChartButler[0].IsDataSourceNull()
+                        && Settings.Default.DataSource != chartButlerDataSet.ChartButler[0].DataSource)
+                {
+                    // möchte der Benutzer die Datenquelle wechseln?
+                    if (MessageBox.Show(this, "Möchten Sie wirklich die Datenquelle des aktuellen Kartenverzeichnisses auf \""
+                        + Settings.Default.DataSource + "\" umschalten?" + Environment.NewLine
+                        + Environment.NewLine
+                        + "Hierfür werden alle Karten zunächst lokal gelöscht und dann erneut herunter geladen!" + Environment.NewLine
+                        + "Außerdem geht dabei die Historie der Kartenupdates verloren." + Environment.NewLine
+                        + Environment.NewLine
+                        + "BITTE LEGEN SIE ZUVOR EIN BACKUP AN!" + Environment.NewLine
+                        , "Datenquelle umschalten", MessageBoxButtons.YesNo,
+                         MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                    {
+                        switchDataBaseDataSource();
+                    }
+                    Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
+                }
                 updateTreeView();
             }
             updateUpdateRequiredPanel();
@@ -541,9 +559,9 @@ namespace ChartButlerCS
                     if (chartButlerDataSet.ChartButler.Count > 0)
                     {
                         if (chartButlerDataSet.ChartButler[0].IsDataSourceNull())
-                            Settings.Default.DataSource = "GAT24";
-                        else
-                            Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
+                            chartButlerDataSet.ChartButler[0].DataSource = "GAT24";
+                       
+                        Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
                     }
                     else
                         Settings.Default.DataSource = null;
@@ -644,6 +662,66 @@ namespace ChartButlerCS
             }
         }
 
+        /// <summary>
+        /// Wechselt die Datenquelle der aktuell geladenen Datenbank.
+        /// Hierfür werden zunächst alle Karten aus dem kartenverzeichnis gelöscht und dann alle
+        /// abbonnierten Flugplätze erneut zur Datenbank hinzu gefügt.
+        /// </summary>
+        private void switchDataBaseDataSource()
+        {
+            string[] fieldsICAO = new string[chartButlerDataSet.Airfields.Count];
+            for (int idx = 0; idx < chartButlerDataSet.Airfields.Count; ++idx)
+                fieldsICAO[idx] = chartButlerDataSet.Airfields[idx].ICAO;
+
+            // Vorhandenen Daten aus dem Weg verschieben
+
+            string[] dirList = Directory.GetDirectories(Settings.Default.ChartFolder.ToString());
+
+            string tempDirectory = Path.Combine(Settings.Default.ChartFolder, Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDirectory);
+            foreach (string dirName in dirList)
+                Directory.Move(dirName, Path.Combine(tempDirectory, Path.GetFileName(dirName)));
+            if (File.Exists(Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml")))
+                File.Move(Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml"), Path.Combine(tempDirectory, ".ChartButler.xml"));
+
+            try
+            {
+                // Datenbank neu initialisieren
+                chartButlerDataSet.Clear();
+                // und alle zuvor vorhandenen Flugplätze erneut laden
+                CServerConnection conn = new CServerConnection(this, chartButlerDataSet);
+                conn.doUpdate(fieldsICAO);
+
+                if (chartButlerDataSet.Airfields.Count != fieldsICAO.Length)
+                {
+                    if (DialogResult.Cancel == MessageBox.Show("Entschuldigung! " + Environment.NewLine + 
+                        "Es konnten leider nur " + chartButlerDataSet.Airfields.Count.ToString() + " von " +
+                        fieldsICAO.Length.ToString() + " Flugplätzen herunter geladen werden!",
+                        "Wechsel der Datenquelle", 
+                        MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2))
+                    {
+                        throw new Exception();
+                    }
+                }
+                updateDataBase();
+            }
+            catch(Exception)
+            {
+                // im Fehlerfall alles wiederherstellen
+                if (File.Exists(Path.Combine(tempDirectory, ".ChartButler.xml")))
+                    File.Move(Path.Combine(tempDirectory, ".ChartButler.xml"), Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml"));
+
+                string[] bakDirList = Directory.GetDirectories(tempDirectory);
+                foreach (string dirName in bakDirList)
+                    Directory.Move(dirName, Path.Combine(Settings.Default.ChartFolder, Path.GetFileName(dirName)));
+                // und Datenbank neu einlesen
+                readDataBase();
+            }
+            finally
+            {
+                Directory.Delete(tempDirectory, true);
+            }
+        }
 
         private ChartButlerDataSet.AirfieldsRow CheckAFinDB(string ICAO, string AFname)
         {

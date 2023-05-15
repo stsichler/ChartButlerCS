@@ -100,6 +100,7 @@ namespace ChartButlerCS
             {
                 foreach(var field in newFields)
                     DFS_AddNewField(field);
+                System.Threading.Thread.Sleep(3000);
             }
             else
             {
@@ -180,7 +181,7 @@ namespace ChartButlerCS
                 sts.Invoke((MethodInvoker)delegate {
                     sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
 
-                    sts.progressBar.Maximum = 3 + chartLinks.Count;
+                    sts.progressBar.Maximum += 3 + chartLinks.Count - 6;
                     sts.progressBar.PerformStep();
                     sts.txtProgress.AppendText("Hole Karten-Dateien ab... " + Environment.NewLine);
                 });
@@ -208,9 +209,8 @@ namespace ChartButlerCS
 
                 sts.Invoke((MethodInvoker)delegate {
                     sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
-                    sts.progressBar.Value = sts.progressBar.Maximum;
+                    sts.progressBar.PerformStep();
                 });
-                System.Threading.Thread.Sleep(3000);
             }
             else
             {
@@ -233,17 +233,17 @@ namespace ChartButlerCS
             {
                 DateTime lastUpdate = chartButlerDataset.AIP[0].LastUpdate;
                 sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("AIP Stand bei letzter Überprüfung: " + lastUpdate.ToShortDateString() + Environment.NewLine); });
-//                if ((Update - lastUpdate).Days == Settings.Default.AiracUpdateInterval && same_chartbutler_version)
-//                    full_update_required = false;
 
-                //if (Update == lastUpdate && same_chartbutler_version)
-                //{
-                //    sts.Invoke((MethodInvoker)delegate {
-                //        sts.txtProgress.AppendText(Environment.NewLine + "Keine Aktualisierung notwendig!" + Environment.NewLine);
-                //        sts.progressBar.Value = sts.progressBar.Maximum; });
-                //    System.Threading.Thread.Sleep(3000);
-                //    return;
-                //}
+                if (Update == lastUpdate && same_chartbutler_version)
+                {
+                    sts.Invoke((MethodInvoker)delegate
+                    {
+                        sts.txtProgress.AppendText(Environment.NewLine + "Keine Aktualisierung notwendig!" + Environment.NewLine);
+                        sts.progressBar.Value = sts.progressBar.Maximum;
+                    });
+                    System.Threading.Thread.Sleep(3000);
+                    return;
+                }
             }
 
             List<string> AFlist = new List<string>();

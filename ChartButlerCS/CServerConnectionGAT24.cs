@@ -89,6 +89,7 @@ namespace ChartButlerCS
             {
                 foreach( var field in newFields )
                     GAT24_AddNewField(field);
+                System.Threading.Thread.Sleep(3000);
             }
             else
             {
@@ -118,6 +119,14 @@ namespace ChartButlerCS
                     return;
                 }
 
+                if (chartButlerDataset.AIP.Count == 0)
+                {
+                    // Datum des letzten AIP Updates ermitteln
+                    string htmlText = Utility.GetURLText(GAT24_InsertSID(Settings.Default.GAT24_ServerAmendedURL, GAT24_SID), ServerCertificateValidationCallback);
+                    int pos = 0;
+                    Update = DateTime.Parse(Utility.GetTextBetween(htmlText, "Karten und Daten zum ", " berichtigt:", ref pos));
+                }
+
                 afrow = chartButlerDataset.Airfields.NewAirfieldsRow();
                 afrow.ICAO = newFieldICAO;
                 afrow.AFname = FieldName;
@@ -140,7 +149,7 @@ namespace ChartButlerCS
                 sts.Invoke((MethodInvoker)delegate {
                     sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
 
-                    sts.progressBar.Maximum = 3 + chartLinks.Count;
+                    sts.progressBar.Maximum += 3 + chartLinks.Count - 6;
                     sts.progressBar.PerformStep();
                     sts.txtProgress.AppendText("Hole Karten-Dateien ab..." + Environment.NewLine);
                 });
@@ -162,11 +171,13 @@ namespace ChartButlerCS
                     throw;
                 }
 
+                if (chartButlerDataset.AIP.Count == 0)
+                    chartButlerDataset.AIP.AddAIPRow(Update);
+
                 sts.Invoke((MethodInvoker)delegate {
                     sts.txtProgress.AppendText("erledigt!" + Environment.NewLine);
-                    sts.progressBar.Value = sts.progressBar.Maximum;
+                    sts.progressBar.PerformStep();
                 });
-                System.Threading.Thread.Sleep(3000);
             }
             else
             {
