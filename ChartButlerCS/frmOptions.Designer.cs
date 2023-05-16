@@ -93,7 +93,7 @@
             // 
             // txtPW2
             // 
-            this.txtPW2.Location = new System.Drawing.Point(14, 111);
+            this.txtPW2.Location = new System.Drawing.Point(15, 132);
             this.txtPW2.Name = "txtPW2";
             this.txtPW2.PasswordChar = '*';
             this.txtPW2.Size = new System.Drawing.Size(176, 20);
@@ -102,7 +102,7 @@
             // 
             // txtPW1
             // 
-            this.txtPW1.Location = new System.Drawing.Point(14, 85);
+            this.txtPW1.Location = new System.Drawing.Point(15, 106);
             this.txtPW1.Name = "txtPW1";
             this.txtPW1.PasswordChar = '*';
             this.txtPW1.Size = new System.Drawing.Size(176, 20);
@@ -111,7 +111,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 12);
+            this.label1.Location = new System.Drawing.Point(12, 24);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(75, 13);
             this.label1.TabIndex = 0;
@@ -121,7 +121,7 @@
             // 
             this.txtUser.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtUser.Location = new System.Drawing.Point(14, 28);
+            this.txtUser.Location = new System.Drawing.Point(15, 40);
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(336, 20);
             this.txtUser.TabIndex = 1;
@@ -129,7 +129,7 @@
             // chkSavePW
             // 
             this.chkSavePW.AutoSize = true;
-            this.chkSavePW.Location = new System.Drawing.Point(14, 62);
+            this.chkSavePW.Location = new System.Drawing.Point(15, 82);
             this.chkSavePW.Name = "chkSavePW";
             this.chkSavePW.Size = new System.Drawing.Size(118, 17);
             this.chkSavePW.TabIndex = 2;
@@ -254,7 +254,7 @@
             this.ControlBox = false;
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
-            this.MinimumSize = new System.Drawing.Size(400, 255);
+            this.MinimumSize = new System.Drawing.Size(400, 278);
             this.Name = "frmOptions";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

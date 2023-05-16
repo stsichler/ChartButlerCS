@@ -83,8 +83,11 @@ namespace ChartButlerCS
                     "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie " +
                     "EuroGAT24-Zugangsdaten ein, falls Sie diese besitzen." + Environment.NewLine +
                     Environment.NewLine +
-                    "Falls Sie kein EuroGAT24 Konto besitzen, können die AIP-Charts auch alternativ " +
-                    "von der kostenfreien BasicVFR AIP Veröffentlichung der DFS geladen werden." +
+                    "Falls Sie kein EuroGAT24 Kunde sind, können die AIP-Charts auch stattdessen " +
+                    "von der kostenfreien BasicVFR AIP Veröffentlichung der DFS geladen werden." + Environment.NewLine +
+                    Environment.NewLine +
+                    "ACHTUNG: Beachten Sie bitte, dass dies eventuell einer schriftlichen Zustimmung " +
+                    "durch die DFS erfordert, siehe Nutzungsbedingungen des AIS-Portals der DFS." +
                     Environment.NewLine;
                 }
 
@@ -513,7 +516,7 @@ namespace ChartButlerCS
         public void readDataBase()
         {
             chartButlerDataSet.Clear();
-            string windowTitle = "ChartButler(C) 2020-2023 Jörg Pauly / Stefan Sichler";
+            string windowTitle = "ChartButler(C) 2016-2023 Jörg Pauly / Stefan Sichler";
 
             if (Settings.Default.ChartFolder.Length > 0)
             {

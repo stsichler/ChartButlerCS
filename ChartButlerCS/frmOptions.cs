@@ -100,12 +100,14 @@ namespace ChartButlerCS
 
         private void radioButtonDFS_CheckedChanged(object sender, EventArgs e)
         {
-            pending_settings.DataSource = "DFS";
+            if (radioButtonDFS.Checked)
+                pending_settings.DataSource = "DFS";
         }
 
         private void radioButtonGAT24_CheckedChanged(object sender, EventArgs e)
         {
-            pending_settings.DataSource = "GAT24";
+            if (radioButtonGAT24.Checked)
+                pending_settings.DataSource = "GAT24";
         }
     }//end Class
 }//end NameSpace

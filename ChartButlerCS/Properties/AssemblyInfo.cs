@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Stefan Sichler")]
 [assembly: AssemblyProduct("ChartButler")]
-[assembly: AssemblyCopyright("Copyright © 2017-2023 Stefan Sichler")]
+[assembly: AssemblyCopyright("Copyright © 2016-2023 Stefan Sichler")]
 [assembly: AssemblyTrademark("ChartButler")]
 [assembly: AssemblyCulture("")]
 

@@ -15,16 +15,21 @@ Rechtlicher Hinweis:
 ChartButlerCS kann Ihnen dabei nur als **Hilfe** dienen! Es handelt sich um keine offiziell zugelassene Software zur Verwaltung von AIP-Charts.
 
 Diese Software wurde zwar mit größter Sorgfalt und bestem Gewissen programmiert, dennoch sind Fehlfunktionen grundsätzlich nicht auszuschließen.
+
 Der Autor dieser Software haftet nicht für Schäden, die hieraus entstehen. 
 
 ---
-**Systemvoraussetzungen:** Windows 7 SP1 oder höher mit [.NET Framework 4.5 oder höher](https://dotnet.microsoft.com/download/dotnet-framework) oder Linux oder macOS mit aktuellem [Mono Framework](https://www.mono-project.com/)
+**Systemvoraussetzungen:** Windows 7 SP1 oder höher mit [.NET Framework 4.8 oder höher](https://dotnet.microsoft.com/download/dotnet-framework) oder Linux oder macOS mit aktuellem [Mono Framework](https://www.mono-project.com/)
 
-**Dieses Programm ist frei erhältlich. Zur Benutzung wird jedoch ein [GAT24.de](https://www.gat24.de/) Benutzerkonto benötigt!**
+**Dieses Programm ist frei erhältlich.**
 
 ![Screenshot](https://github.com/stsichler/ChartButlerCS/raw/master/Screenshot.png)
 
 Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
+
+- AIP-Charts können nun entweder von [GAT24](https://www.gat24.de/) oder von der [BasicVFR AIP Veröffentlichung der DFS](https://aip.dfs.de/BasicVFR) bezogen werden
+
+- Für AIP-Charts aus der BasicVFR AIP der DFS werden "TripKit" PDFs im Stil von GAT24 erzeugt
 
 - Es werden nun auch Vorschaubilder der Anflugkarten herunter geladen und angezeigt
 
@@ -35,8 +40,18 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 - Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen  
 
 ---
-Kartenmaterial von [EuroGAT24 GmbH](https://www.gat24.de/).
+Falls als Datenquelle "GAT24" gewählt ist:
+
+Kartenmaterial bereitgestellt durch [EuroGAT24 GmbH](https://www.gat24.de/). 
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
+
+
+Falls als Datenquelle "DFS BasicVFR" gewählt ist:
+
+Kartenmaterial bereitgestellt durch [DFS Deutsche Flugsicherung GmbH](https://aip.dfs.de/BasicVFR).
+
+**ACHTUNG: Die Nutzung der AIP mit diesem Tool erfordert eventuell einer schriftlichen Zustimmung durch die DFS, siehe [Nutzungsbedingungen](https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp)**
+
 
 Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
 

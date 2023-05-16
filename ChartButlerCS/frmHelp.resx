@@ -132,10 +132,10 @@ Flugplatz hinzufügen:
 Es kann der ICAO-Code für einen neuen Flugplatz angegeben werden, dessen Karten dann heruntergeladen und in Zukunft aktuell gehalten werden.
 
 Karten aktualisieren:
-Die Karten der abonnierten Flugplätze werden ggf. durch aktualisierte Karten vom GAT24 Server ersetzt. Falls seit der letzten Aktualisierung nur eine einzige AIP Veröffentlichung lag, werden nur die von dieser Veröffentlichung betroffenen Flugplätze überprüft, andernfalls werden alle abonnierten Plätze berücksichtigt. 
+Die Karten der abonnierten Flugplätze werden ggf. durch aktualisierte Karten vom Server ersetzt.
 
 Optionen:
-Hier können die Login-Daten für GAT24 hinterlegt, sowie das Verzeichnis für die Karten festgelegt werden.
+Hier kann das Verzeichnis für die Karten festgelegt werden und die Datenquelle gewählt werden. Optional können hier auch die Login-Daten für GAT24 hinterlegt werden. 
 
 Hilfe/Info:
 Die lesen Sie gerade... ;-)
@@ -144,8 +144,7 @@ Schließen:
 Beendet den ChartButler.
 
 Noch ein allgemeiner Hinweis:
-ChartButler speichert seine Karten-Datenbank neben den Karten selbst als versteckte xml-Datei im Karten-Verzeichnis. Sie können das Karten-Verzeichnis daher umbenennen, zwischen verschiedenen Rechnern hin- und her-kopieren bzw. synchronisieren oder sogar mehrere Karten-Verzeichnisse verwenden, ohne die Karten-Datenbank damit zu beeinträchtigen.
-</value>
+ChartButler speichert seine Karten-Datenbank neben den Karten selbst als versteckte xml-Datei im Karten-Verzeichnis. Sie können das Karten-Verzeichnis daher umbenennen, zwischen verschiedenen Rechnern hin- und her-kopieren bzw. synchronisieren oder sogar mehrere Karten-Verzeichnisse verwenden, ohne die Karten-Datenbank damit zu beeinträchtigen.</value>
   </data>
   <data name="richTextBox2.Text" xml:space="preserve">
     <value>
@@ -154,14 +153,20 @@ https://stsichler.github.io/ChartButlerCS/
 
 Idee und Originalversion (C) 2010 Jörg Pauly
 
-(Diese) vollständig überarbeitete Version (C) 2016 Stefan Sichler
+(Diese) vollständig überarbeitete Version (C) 2016-2023 Stefan Sichler
 mit freundlicher Genehmigung von Jörg Pauly,
 alle Rechte vorbehalten!
 
-Dieses Programm ist frei erhältlich und ist für alle Kunden von GAT24.de lizenziert.
+Dieses Programm ist frei erhältlich.
 
-Kartenmaterial von EuroGAT24 GmbH, https://www.gat24.de
+Falls als Datenquelle "GAT24" gewählt ist:
+Kartenmaterial bereitgestellt durch EuroGAT24 GmbH, https://www.gat24.de
 Mit freundlicher Unterstützung von Gerd R. Nehr, EuroGAT24 GmbH.
+
+Falls als Datenquelle "DFS BasicVFR" gewählt ist:
+Kartenmaterial bereitgestellt durch DFS Deutsche Flugsicherung GmbH, https://aip.dfs.de/BasicVFR
+ACHTUNG: Die Nutzung der AIP mit diesem Tool erfordert eventuell einer schriftlichen Zustimmung
+durch die DFS, siehe https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp
 
 Dieses Programm verwendet Teile der PDFsharp Bibliothek.
 PDFsharp - A .NET library for processing PDF
@@ -174,7 +179,6 @@ Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
 
 
 Fehler, Kritik, Anregungen und Wünsche bitte per Mail an:
-mailto:stefan.sichler@gmx.de
-</value>
+mailto:stefan.sichler@gmx.de</value>
   </data>
 </root>
