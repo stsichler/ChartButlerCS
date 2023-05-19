@@ -243,7 +243,8 @@ namespace ChartButlerCS
         private void updateButtons()
         {
             cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0
-                && (Settings.Default.ServerUsername.Length > 0 || "DFS" == Settings.Default.DataSource);
+                && ((Settings.Default.ServerUsername.Length > 0 && "GAT24" == Settings.Default.DataSource)
+                    || "DFS" == Settings.Default.DataSource);
 
             cmdUpdateCharts.Enabled = cmdNewAF.Enabled && chartButlerDataSet.Airfields.Count != 0;
 
@@ -413,7 +414,7 @@ namespace ChartButlerCS
 
                     try
                     {
-                        Directory.Delete(Path.Combine(Settings.Default.ChartFolder,node.Text), true);
+                        Directory.Delete(node.Text, true);
                     }
                     catch(Exception)
                     {
@@ -526,7 +527,7 @@ namespace ChartButlerCS
                 if (Directory.Exists(ChartButlerCS.Settings.Default.ChartFolder))
                 {
                     Directory.SetCurrentDirectory(ChartButlerCS.Settings.Default.ChartFolder);
-                    string dbPath = Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml");
+                    string dbPath = ".ChartButler.xml";
                     try
                     {
                         if (File.Exists(dbPath))
@@ -585,7 +586,7 @@ namespace ChartButlerCS
             // Da die Aktualität der Karten über die Previews geprüft wird, ist es
             // ein Problem, wenn diese nicht vorhanden sind.
             bool l_update_needed = false;
-            string[] dirList = Directory.GetDirectories(Settings.Default.ChartFolder.ToString());
+            string[] dirList = Directory.GetDirectories(".");
             foreach (string dirName in dirList)
             {
                 string strpDirName = Path.GetFileName(dirName);
@@ -646,7 +647,7 @@ namespace ChartButlerCS
 
             if (Settings.Default.ChartFolder.Length > 0)
             {
-                string dbPath = Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml");
+                string dbPath = ".ChartButler.xml";
                 if (chartButlerDataSet.AFCharts.Count != 0)
                 {
                     string tmpDbPath = Path.GetTempFileName();
@@ -678,14 +679,14 @@ namespace ChartButlerCS
 
             // Vorhandenen Daten aus dem Weg verschieben
 
-            string[] dirList = Directory.GetDirectories(Settings.Default.ChartFolder.ToString());
+            string[] dirList = Directory.GetDirectories(".");
 
-            string tempDirectory = Path.Combine(Settings.Default.ChartFolder, Path.GetRandomFileName());
+            string tempDirectory = "TEMP." + Path.GetRandomFileName();
             Directory.CreateDirectory(tempDirectory);
             foreach (string dirName in dirList)
                 Directory.Move(dirName, Path.Combine(tempDirectory, Path.GetFileName(dirName)));
-            if (File.Exists(Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml")))
-                File.Move(Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml"), Path.Combine(tempDirectory, ".ChartButler.xml"));
+            if (File.Exists(".ChartButler.xml"))
+                File.Move(".ChartButler.xml", Path.Combine(tempDirectory, ".ChartButler.xml"));
 
             try
             {
@@ -712,11 +713,11 @@ namespace ChartButlerCS
             {
                 // im Fehlerfall alles wiederherstellen
                 if (File.Exists(Path.Combine(tempDirectory, ".ChartButler.xml")))
-                    File.Move(Path.Combine(tempDirectory, ".ChartButler.xml"), Path.Combine(Settings.Default.ChartFolder, ".ChartButler.xml"));
+                    File.Move(Path.Combine(tempDirectory, ".ChartButler.xml"), ".ChartButler.xml");
 
                 string[] bakDirList = Directory.GetDirectories(tempDirectory);
                 foreach (string dirName in bakDirList)
-                    Directory.Move(dirName, Path.Combine(Settings.Default.ChartFolder, Path.GetFileName(dirName)));
+                    Directory.Move(dirName, Path.GetFileName(dirName));
                 // und Datenbank neu einlesen
                 readDataBase();
             }

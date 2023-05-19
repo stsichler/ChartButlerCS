@@ -12,13 +12,14 @@ namespace ChartButlerCS
     {
         public static string BuildChartPath(ChartButlerDataSet.AFChartsRow chartRow)
         {
-            return Path.Combine(Path.Combine(Settings.Default.ChartFolder,
-                chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname), chartRow.Cname);
+            return Path.Combine(
+                chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname, 
+                chartRow.Cname);
         }
         public static string BuildChartPreviewPath(ChartButlerDataSet.AFChartsRow chartRow, string extension)
         {
-            return Path.Combine(Path.Combine(Settings.Default.ChartFolder,
-                chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname),
+            return Path.Combine(
+                chartRow.ICAO + " - " + chartRow.AirfieldsRow.AFname,
                 "." + chartRow.Cname + "_preview." + extension);
         }
 
