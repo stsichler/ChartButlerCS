@@ -55,8 +55,8 @@ namespace ChartButlerCS
 
             string text = "";
 
-            const string eulaVersion = "v1"; // rechtlicher Hinweis in Version v1
-            if (Settings.Default.EulaRead != eulaVersion)
+            const string eulaVersion = "v2"; // rechtlicher Hinweis in Version v2
+            if (String.IsNullOrEmpty(Settings.Default.EulaRead))
             {
                 showMsgBox = true;
                 showEula = true;
@@ -73,21 +73,28 @@ namespace ChartButlerCS
                     "Der Autor dieser Software haftet nicht für Schäden, die hieraus entstehen." + Environment.NewLine +
                     Environment.NewLine;
             }
+            if (String.IsNullOrEmpty(Settings.Default.EulaRead) || Settings.Default.EulaRead == "v1" 
+                || Settings.Default.EulaRead != eulaVersion)
+            {
+                showMsgBox = true;
+                showEula = true;
+                text +=
+                    "Seit Version 2.x unterstützt ChartButler als Datenquelle für AIP-Charts neben dem GAT24 Server " +
+                    "auch die kostenfreie BasicVFR AIP Veröffentlichung der DFS, siehe \"Optionen\". " + Environment.NewLine +
+                    Environment.NewLine +
+                    "ACHTUNG: Beachten Sie bitte, dass dies eventuell eine schriftliche Zustimmung " +
+                    "durch die DFS erfordert, siehe Nutzungsbedingungen des AIS-Portals der DFS!" + Environment.NewLine +
+                    Environment.NewLine;
+            }
 
             if (Settings.Default.ChartFolder.Length == 0 && chartButlerDataSet.Airfields.Count == 0)
             {
                 showMsgBox = true;
                 showOptions = true;
                 text +=
-                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis " +
-                    "aus, in dem die Anflugkarten gespeichert werden sollen und tragen Sie " +
-                    "EuroGAT24-Zugangsdaten ein, falls Sie diese besitzen." + Environment.NewLine +
-                    Environment.NewLine +
-                    "Falls Sie kein EuroGAT24 Kunde sind, können die AIP-Charts auch stattdessen " +
-                    "von der kostenfreien BasicVFR AIP Veröffentlichung der DFS geladen werden." + Environment.NewLine +
-                    Environment.NewLine +
-                    "ACHTUNG: Beachten Sie bitte, dass dies eventuell einer schriftlichen Zustimmung " +
-                    "durch die DFS erfordert, siehe Nutzungsbedingungen des AIS-Portals der DFS." +
+                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis aus, " +
+                    "wählen Sie die gewünschte Datenquelle und tragen Sie dort im Falle von GAT24 " +
+                    "auch Ihre Zugangsdaten ein." + Environment.NewLine +
                     Environment.NewLine;
                 }
 
