@@ -37,7 +37,7 @@ Neben vielen kleineren Fehlerkorrekturen bietet diese Version folgende Vorteile:
 
 - ChartButlerCS ist nun ein Single-File Executable, benötigt daher keine Installation mehr und kann von einem beliebigen Ort - z.B. einem USB-Stick - gestartet werden. Außerdem werden grundsätzlich keine Administrator-Rechte mehr benötigt
 
-- Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen  
+- Die Kartendatenbank wird nun in einer versteckten Datei im Kartenverzeichnis abgelegt, dadurch ist es möglich mehrere Kartenverzeichnisse auf dem Rechner zu pflegen
 
 ---
 Falls als Datenquelle "GAT24" gewählt ist:
@@ -50,7 +50,7 @@ Falls als Datenquelle "DFS BasicVFR" gewählt ist:
 
 Kartenmaterial bereitgestellt durch [DFS Deutsche Flugsicherung GmbH](https://aip.dfs.de/BasicVFR).
 
-**ACHTUNG: Die Nutzung der AIP mit diesem Tool erfordert eventuell einer schriftlichen Zustimmung durch die DFS, siehe [Nutzungsbedingungen](https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp)**
+**ACHTUNG: Die Nutzung der AIP mit diesem Tool erfordert eventuell eine schriftliche Zustimmung durch die DFS, siehe [Nutzungsbedingungen](https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp)**
 
 
 Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
