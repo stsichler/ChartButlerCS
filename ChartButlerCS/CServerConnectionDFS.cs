@@ -225,7 +225,6 @@ namespace ChartButlerCS
         {
             sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Letzte veröffentlichte AIP Berichtigung: " + Update.ToShortDateString() + Environment.NewLine); });
 
-//            bool full_update_required = true;
             bool same_chartbutler_version = (chartButlerDataset.ChartButler.Count != 0 
                 && chartButlerDataset.ChartButler[0].Version == System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
@@ -248,28 +247,12 @@ namespace ChartButlerCS
 
             List<string> AFlist = new List<string>();
 
-//            if (full_update_required)
-            {
-                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze... " + Environment.NewLine); });
+            sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe alle abonnierten Flugplätze... " + Environment.NewLine); });
 
-                ChartButlerDataSet.AirfieldsDataTable d = chartButlerDataset.Airfields;
-                for (int j = 0; j < d.Count; ++j)
-                    AFlist.Add(d.Rows[j][d.ICAOColumn].ToString());
-            }
-/*            else
-            {
-                sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Überprüfe berichtigte Flugplätze... " + Environment.NewLine); });
+            ChartButlerDataSet.AirfieldsDataTable d = chartButlerDataset.Airfields;
+            for (int j = 0; j < d.Count; ++j)
+                AFlist.Add(d.Rows[j][d.ICAOColumn].ToString());
 
-                int i = 0;
-                while (true)
-                {
-                    string Icao = Utility.GetTextAfterPhrase(htmlText, "&ICAO=", 4, ref i);
-                    if (-1 == i)
-                        break;
-                    AFlist.Add(Icao);
-                }
-            }
-*/
             sts.Invoke((MethodInvoker)delegate {
                 sts.progressBar.Maximum = 2 + AFlist.Count * 4;
                 sts.progressBar.PerformStep(); });
