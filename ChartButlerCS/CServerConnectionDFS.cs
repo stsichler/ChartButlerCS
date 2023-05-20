@@ -637,7 +637,7 @@ namespace ChartButlerCS
 
                 // PDF Dokument + Preview erstellen
 
-                int pageCnt = 0;
+                int pageCnt = 0; // zählt DINA5 Halbseiten in einem DINA4 Landscape PDF Dokument
                 DateTime chartUpdate = new DateTime();
 
                 using (var pdfDocument = new PdfDocument())
@@ -655,41 +655,62 @@ namespace ChartButlerCS
                         if (!subChartRow.IsLastUpdateNull() && subChartRow.LastUpdate.Subtract(chartUpdate).TotalDays > 0)
                             chartUpdate = subChartRow.LastUpdate;
 
-                        PdfPage pdfPage;
-                        if (pageCnt % 2 == 0)
-                        {
-                            pdfPage = pdfDocument.AddPage();
-                            pdfPage.Size = PdfSharp.PageSize.A4;
-                            pdfPage.Orientation = PdfSharp.PageOrientation.Landscape;
-                        }
-                        else
-                        {
-                            pdfPage = pdfDocument.Pages[pageCnt / 2];
-                        }
-
                         string subChartPath = Utility.BuildChartPath(subChartRow);
                         if (File.Exists(subChartPath))
                         {
                             using (Image img = Image.FromFile(subChartPath))
                             {
+                                bool is_landscape = (img.Width > img.Height);
+
+                                // rechte Seitenhälfte überspringen, falls Chart DINA4 Landscape ist
+                                if (is_landscape && (pageCnt % 2) != 0)
+                                    pageCnt++;
+
+                                // neue Seite erstellen, falls notwendig
+
+                                PdfPage pdfPage;
+                                if (pageCnt % 2 == 0)
+                                {
+                                    pdfPage = pdfDocument.AddPage();
+                                    pdfPage.Size = PdfSharp.PageSize.A4;
+                                    pdfPage.Orientation = PdfSharp.PageOrientation.Landscape;
+                                }
+                                else
+                                {
+                                    pdfPage = pdfDocument.Pages[pageCnt / 2];
+                                }
+
+                                // PDF Seite erstellen
+
                                 using (XImage ximg = XImage.FromGdiPlusImage((Image)img.Clone()))
                                 using (XGraphics xgfx = XGraphics.FromPdfPage(pdfPage))
                                 {
-                                    xgfx.DrawImage(ximg, (pageCnt % 2) * pdfPage.Width / 2, 0, 
-                                        pdfPage.Width / 2, pdfPage.Height);
+                                    if (is_landscape)
+                                        xgfx.DrawImage(ximg, 0, 0,
+                                            pdfPage.Width, pdfPage.Height);
+                                    else
+                                        xgfx.DrawImage(ximg, (pageCnt % 2) * pdfPage.Width / 2, 0, 
+                                            pdfPage.Width / 2, pdfPage.Height);
                                 }
+
+                                // Preview Grafik erstellen
+
                                 if (pageCnt < 2)
                                 {
                                     using (Graphics gfx = Graphics.FromImage(previewBitmap))
                                     {
-                                        gfx.DrawImage(img, (pageCnt % 2) * previewBitmap.Width / 2, 0,
-                                            previewBitmap.Width / 2, previewBitmap.Height);
+                                        if (is_landscape)
+                                            gfx.DrawImage(img, 0, 0,
+                                                previewBitmap.Width, previewBitmap.Height);
+                                        else
+                                            gfx.DrawImage(img, (pageCnt % 2) * previewBitmap.Width / 2, 0,
+                                                previewBitmap.Width / 2, previewBitmap.Height);
                                     }
                                 }
+
+                                pageCnt += is_landscape ? 2 : 1;
                             }
                         }
-
-                        ++pageCnt;
                     }
 
                     pdfDocument.Save(tmpChartPath);
