@@ -172,7 +172,7 @@ namespace ChartButlerCS
 
                     sts.txtProgress.AppendText("Lade Karten-Liste... ");
                 });
-                List<DFS_ChartLink> chartLinks = DFS_GetChartLinks(AFSite);
+                List<DFS_ChartLink> chartLinks = DFS_GetChartLinks(afrow.ICAO, AFSite);
                 if (chartLinks.Count == 0)
                 {
                     errorText = "Es sind keine Karten verfügbar!";
@@ -296,7 +296,7 @@ namespace ChartButlerCS
 
                     if (AFSite != null)
                     {
-                        List<DFS_ChartLink> chartLinks = DFS_GetChartLinks(AFSite);
+                        List<DFS_ChartLink> chartLinks = DFS_GetChartLinks(afrow.ICAO, AFSite);
 
                         if (chartLinks.Count > 0 && chartLinks[0].airfield_permalink != airfield_permalink)
                         {
@@ -390,9 +390,10 @@ namespace ChartButlerCS
         /// <summary>
         /// Stellt die Liste der Download-Links für alle Charts eines Flugplatzes bereit.
         /// </summary>
+        /// <param name="ICAO">Die ICAO Kennung des Flugplatzes</param>
         /// <param name="AFSite">Die URL der Flugplatz Seite</param>
         /// <returns>Eine Liste mit den Download-Links</returns>
-        private List<DFS_ChartLink> DFS_GetChartLinks(Uri AFSite)
+        private List<DFS_ChartLink> DFS_GetChartLinks(string ICAO, Uri AFSite)
         {
             string AFstream = DFS_GetRedirectURLText2(ref AFSite);
 
@@ -431,6 +432,8 @@ namespace ChartButlerCS
                             && node.Attributes["lang"].Value == "de")
                         {
                             name = node.InnerText;
+                            if (!name.StartsWith(ICAO))
+                                name = ICAO + " " + name;
                         }
                         if (node.Attributes["class"].Value == "document-icon")
                         {
@@ -488,7 +491,7 @@ namespace ChartButlerCS
                 }
                 else
                 {
-                    string Cname = Utility.GetFilenameFor(chartLink.name, "png");
+                    string Cname = Utility.GetFilenameFor(chartLink.name) + ".png";
 
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText(Cname + "... "); });
 
@@ -642,7 +645,10 @@ namespace ChartButlerCS
 
                 using (var pdfDocument = new PdfDocument())
                 using (var previewBitmap = new Bitmap(840, 594, PixelFormat.Format24bppRgb))
+                using (var previewGfx = Graphics.FromImage(previewBitmap))
                 {
+                    previewGfx.Clear(Color.White);
+
                     foreach (ChartButlerDataSet.AFChartsRow subChartRow in afrow.GetAFChartsRows())
                     {
                         if (subChartRow.Cname == Cname) // TripKit Eintrag in der Datenbank überspringen
@@ -697,15 +703,12 @@ namespace ChartButlerCS
 
                                 if (pageCnt < 2)
                                 {
-                                    using (Graphics gfx = Graphics.FromImage(previewBitmap))
-                                    {
-                                        if (is_landscape)
-                                            gfx.DrawImage(img, 0, 0,
-                                                previewBitmap.Width, previewBitmap.Height);
-                                        else
-                                            gfx.DrawImage(img, (pageCnt % 2) * previewBitmap.Width / 2, 0,
-                                                previewBitmap.Width / 2, previewBitmap.Height);
-                                    }
+                                    if (is_landscape)
+                                        previewGfx.DrawImage(img, 0, 0,
+                                            previewBitmap.Width, previewBitmap.Height);
+                                    else
+                                        previewGfx.DrawImage(img, (pageCnt % 2) * previewBitmap.Width / 2, 0,
+                                            previewBitmap.Width / 2, previewBitmap.Height);
                                 }
 
                                 pageCnt += is_landscape ? 2 : 1;

@@ -190,15 +190,14 @@ namespace ChartButlerCS
         /// <summary>
         /// Erzeugt einen Dateinamen für einen angegebenen String.
         /// Dabei werden aus dem String alle ungültigen Zeichen entweder ersetzt oder entfernt.
-        /// Optional wird eine Extension angefügt.
         /// </summary>
         /// <param name="name">Der String</param>
         /// <returns>Einen Dateinamen</returns>
-        public static string GetFilenameFor(string name, string extension = null)
+        public static string GetFilenameFor(string name)
         {
             string filename = Regex.Replace(name, @"[/\<>]", "-");
             filename = Regex.Replace(filename, @"['""]", "");
-            return Path.ChangeExtension(filename.Trim(), extension);
+            return filename.Trim();
         }
 
     }
