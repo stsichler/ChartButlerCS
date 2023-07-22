@@ -183,11 +183,12 @@ namespace ChartButlerCS
             updatesNode.NodeFont = new Font(treeView1.Font, FontStyle.Bold);
             treeView1.Nodes.Add(updatesNode);
             updatesNode.Text = "Aktualisierungen";
+            using (BindingSource updatesBindingSource = new BindingSource(chartButlerDataSet, "Updates"))
             {
-                // von neu (unten in der Tabelle) nach alt durchgehen
-                for (int updidx= chartButlerDataSet.Updates.Count - 1; updidx>=0; --updidx)
+                updatesBindingSource.Sort = "Date";
+                for (int updidx = updatesBindingSource.Count - 1; updidx >= 0; --updidx)
                 {
-                    ChartButlerDataSet.UpdatesRow updrow = chartButlerDataSet.Updates[updidx];
+                    ChartButlerDataSet.UpdatesRow updrow = (ChartButlerDataSet.UpdatesRow)((DataRowView)updatesBindingSource[updidx]).Row;
                     TreeNode updNode = new TreeNode(updrow.Date.ToShortDateString());
                     updNode.Tag = updrow;
 
@@ -200,7 +201,7 @@ namespace ChartButlerCS
                         ChartButlerDataSet.AFChartsRow chartrow = (ChartButlerDataSet.AFChartsRow)((DataRowView)chartsBindingSource[chartidx]).Row;
                         updNode.Nodes.Add(chartrow.Cname).Tag = chartrow;
                     }
-                    if (updNode.Nodes.Count != 0) 
+                    if (updNode.Nodes.Count != 0)
                         updatesNode.Nodes.Add(updNode);
                     chartsBindingSource.Dispose();
                 }
