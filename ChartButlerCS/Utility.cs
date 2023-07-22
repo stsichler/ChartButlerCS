@@ -197,7 +197,9 @@ namespace ChartButlerCS
         {
             string filename = Regex.Replace(name, @"[/\<>]", "-");
             filename = Regex.Replace(filename, @"['""]", "");
-            return filename.Trim();
+            filename = filename.Trim();
+            filename = filename.TrimEnd('.');
+            return filename;
         }
 
     }
