@@ -84,9 +84,15 @@ namespace ChartButlerCS
         /// <returns>Die gefundene Zeichenkette.</returns>
         public static string GetTextAfterPhrase(string ContainingText, string SearchPhrase, int numChars, ref int StartAtPos)
         {
-            int Cnt = ContainingText.IndexOf(SearchPhrase, StartAtPos) + SearchPhrase.Length;
-            StartAtPos = Cnt + numChars;
-            return ContainingText.Substring(Cnt, numChars);
+            int Cnt = ContainingText.IndexOf(SearchPhrase, StartAtPos);
+            if (Cnt >= 0)
+            {
+                Cnt += SearchPhrase.Length;
+                StartAtPos = Cnt + numChars;
+                return ContainingText.Substring(Cnt, numChars);
+            }
+            StartAtPos = -1;
+            return string.Empty;
         }
 
         /// <summary>
@@ -102,7 +108,7 @@ namespace ChartButlerCS
         {
             string result = string.Empty;
             int CntStart = ContainingText.IndexOf(SearchPhrase, StartAtPos);
-            if (CntStart > 0)
+            if (CntStart >= 0)
             {
                 CntStart += SearchPhrase.Length;
                 int CntStop = ContainingText.IndexOf(StopPhrase, CntStart);
