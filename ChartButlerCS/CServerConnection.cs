@@ -111,10 +111,7 @@ namespace ChartButlerCS
                {
                    try
                    {
-                       if ("DFS" == Settings.Default.DataSource)
-                           DFS_ConnectionWorker(newFields, dummy);
-                       else if ("GAT24" == Settings.Default.DataSource)
-                           GAT24_ConnectionWorker(newFields, dummy);
+                       DFS_ConnectionWorker(newFields, dummy);
                    }
                    catch (Exception exc)
                    {

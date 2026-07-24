@@ -83,7 +83,7 @@
     </Compile>
     <Compile Include="CServerConnection.cs" />
     <Compile Include="CServerConnectionDFS.cs" />
-    <Compile Include="CServerConnectionGAT24.cs" />
+
     <Compile Include="dlgUpdateOverview.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -477,7 +477,7 @@
     <Content Include="Icon1.png" />
     <Content Include="PdfSharp\PdfSharp.SharpZipLib\ReadMe.txt" />
     <None Include="Resources\AiracUpdateInterval.ico" />
-    <None Include="Resources\GAT24.jpg" />
+
     <None Include="Resources\DFS.png" />
   </ItemGroup>
   <ItemGroup>

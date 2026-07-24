@@ -16,7 +16,7 @@ using System.Drawing.Imaging;
 namespace ChartButlerCS
 {
     /// <summary>
-    /// Diese Klasse stellt Verbindung mit dem gat24-Server her und ruft relevante Daten ab.
+    /// Diese Klasse stellt Verbindung mit dem DFS-Server her und ruft relevante Daten ab.
     /// </summary>
     public partial class CServerConnection
     {   

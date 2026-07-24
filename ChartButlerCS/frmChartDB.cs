@@ -17,6 +17,7 @@ namespace ChartButlerCS
     {
         private List<CChart> clist = new List<CChart>();
         private bool newReleaseAvailable = false;
+        private string dataSource = null;
 
         public frmChartDB()
         {
@@ -45,6 +46,7 @@ namespace ChartButlerCS
         private void frmChartDB_Load(object sender, EventArgs e)
         {
             readDataBase();
+            checkAndPromptMigration();
             updateTreeView();
             updateUpdateRequiredPanel();
             updateButtons();
@@ -73,14 +75,12 @@ namespace ChartButlerCS
                     "Der Autor dieser Software haftet nicht für Schäden, die hieraus entstehen." + Environment.NewLine +
                     Environment.NewLine;
             }
-            if (String.IsNullOrEmpty(Settings.Default.EulaRead) || Settings.Default.EulaRead == "v1" 
-                || Settings.Default.EulaRead != eulaVersion)
+            if (String.IsNullOrEmpty(Settings.Default.EulaRead) || Settings.Default.EulaRead != eulaVersion)
             {
                 showMsgBox = true;
                 showEula = true;
                 text +=
-                    "Seit Version 2.x unterstützt ChartButler als Datenquelle für AIP-Charts neben dem GAT24 Server " +
-                    "auch die kostenfreie BasicVFR AIP Veröffentlichung der DFS, siehe \"Optionen\". " + Environment.NewLine +
+                    "ChartButler nutzt als Datenquelle für AIP-Charts die kostenfreie BasicVFR AIP Veröffentlichung der DFS." + Environment.NewLine +
                     Environment.NewLine +
                     "ACHTUNG: Beachten Sie bitte, dass dies eventuell eine schriftliche Zustimmung " +
                     "durch die DFS erfordert, siehe Nutzungsbedingungen des AIS-Portals der DFS!" + Environment.NewLine +
@@ -92,9 +92,7 @@ namespace ChartButlerCS
                 showMsgBox = true;
                 showOptions = true;
                 text +=
-                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis aus, " +
-                    "wählen Sie die gewünschte Datenquelle und tragen Sie dort im Falle von GAT24 " +
-                    "auch Ihre Zugangsdaten ein." + Environment.NewLine +
+                    "Bitte wählen Sie unter \"Optionen\" zunächst ein Karten-Hauptverzeichnis aus." + Environment.NewLine +
                     Environment.NewLine;
                 }
 
@@ -250,30 +248,8 @@ namespace ChartButlerCS
 
         private void updateButtons()
         {
-            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0
-                && ((Settings.Default.ServerUsername.Length > 0 && "GAT24" == Settings.Default.DataSource)
-                    || "DFS" == Settings.Default.DataSource);
-
+            cmdNewAF.Enabled = Settings.Default.ChartFolder.Length > 0;
             cmdUpdateCharts.Enabled = cmdNewAF.Enabled && chartButlerDataSet.Airfields.Count != 0;
-
-            if ("DFS" == Settings.Default.DataSource)
-            {
-                label1.Visible = true;
-                pictureBox1.Image = Properties.Resources.DFS;
-                pictureBox1.Visible = true;
-            }
-            else if ("GAT24" == Settings.Default.DataSource)
-            {
-                label1.Visible = true;
-                pictureBox1.Image = Properties.Resources.GAT24;
-                pictureBox1.Visible = true;
-            }
-            else
-            {
-                label1.Visible = false;
-                pictureBox1.Visible = false;
-                pictureBox1.Image = null;
-            }
         }
 
         private void label_updateRequired_Click(object sender, EventArgs e)
@@ -353,7 +329,7 @@ namespace ChartButlerCS
             previewPictureBox.Image = preview;
         }
 
-        public static DialogResult InputBox(string title, string promptText, ref string value, bool Password = false)
+        public static DialogResult InputBox(string title, string promptText, ref string value)
         {
             Form form = new Form();
             Label label = new Label();
@@ -389,10 +365,6 @@ namespace ChartButlerCS
             form.MaximizeBox = false;
             form.AcceptButton = buttonOk;
             form.CancelButton = buttonCancel;
-            if (Password == true)
-            {
-                textBox.PasswordChar = '*' ;
-            }            
             DialogResult dialogResult = form.ShowDialog();
             value = textBox.Text;
             return dialogResult;
@@ -437,6 +409,25 @@ namespace ChartButlerCS
 
         private void cmdUpdateCharts_Click(object sender, EventArgs e)
         {
+            if (dataSource == "GAT24")
+            {
+                if (MessageBox.Show(this,
+                    "Die aktuelle Karten-Datenbank verwendet noch GAT24 als Datenquelle, " +
+                    "welche nicht mehr unterstützt wird." + Environment.NewLine + Environment.NewLine +
+                    "Beim Update werden alle vorhandenen Karten gelöscht und erneut von der DFS " +
+                    "heruntergeladen." + Environment.NewLine + Environment.NewLine +
+                    "BITTE LEGEN SIE ZUVOR EIN BACKUP AN!",
+                    "Migration erforderlich", MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) != DialogResult.OK)
+                    return;
+                dataSource = "DFS";
+                switchDataBaseDataSource();
+                updateTreeView();
+                updateUpdateRequiredPanel();
+                updateButtons();
+                return;
+            }
+            dataSource = "DFS";
             CServerConnection cConn = new CServerConnection(this,chartButlerDataSet);            
             clist = cConn.doUpdate(null);
             updateTreeView(); 
@@ -451,10 +442,19 @@ namespace ChartButlerCS
 
         private void cmdNewAF_Click(object sender, EventArgs e)
         {
+            if (dataSource == "GAT24")
+            {
+                MessageBox.Show(this,
+                    "Bitte führen Sie zunächst ein Karten-Update durch, " +
+                    "um die Datenbank auf DFS zu migrieren.",
+                    "Migration erforderlich", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             string srchString = null;
             DialogResult res = InputBox("Neuen Flugplatz abonnieren...", "Bitte ICAO-Code eingeben", ref srchString);
             if (res == System.Windows.Forms.DialogResult.OK)
             {
+                dataSource = "DFS";
                 CServerConnection conn = new CServerConnection(this,chartButlerDataSet);
                 clist = conn.doUpdate(new string[] { srchString });
                 updateTreeView();
@@ -475,41 +475,14 @@ namespace ChartButlerCS
             if (opts.ShowDialog(this) == DialogResult.OK)
             {
                 if (previous_chart_folder != Settings.Default.ChartFolder)
-                    readDataBase();
-                else if (chartButlerDataSet.ChartButler.Count > 0 && !chartButlerDataSet.ChartButler[0].IsDataSourceNull()
-                        && Settings.Default.DataSource != chartButlerDataSet.ChartButler[0].DataSource)
                 {
-                    // möchte der Benutzer die Datenquelle wechseln?
-                    if (MessageBox.Show(this, "Möchten Sie wirklich die Datenquelle des aktuellen Kartenverzeichnisses auf \""
-                        + Settings.Default.DataSource + "\" umschalten?" + Environment.NewLine
-                        + Environment.NewLine
-                        + "Hierfür werden alle Karten zunächst lokal gelöscht und dann erneut herunter geladen!" + Environment.NewLine
-                        + "Außerdem geht dabei die Historie der Kartenupdates verloren." + Environment.NewLine
-                        + Environment.NewLine
-                        + "BITTE LEGEN SIE ZUVOR EIN BACKUP AN!" + Environment.NewLine
-                        , "Datenquelle umschalten", MessageBoxButtons.YesNo,
-                         MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
-                    {
-                        switchDataBaseDataSource();
-                    }
-                    Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
+                    readDataBase();
+                    checkAndPromptMigration();
                 }
                 updateTreeView();
             }
             updateUpdateRequiredPanel();
             updateButtons();
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-            try 
-            {
-                if ("DFS" == Settings.Default.DataSource)
-                    OpenFileInDefaultApp(Properties.Resources.DFS_BaseURL);
-                else if ("GAT24" == Settings.Default.DataSource)
-                    OpenFileInDefaultApp("http://www.gat24.de");
-            }
-            catch (Exception) {}
         }
 
         private void cmdHelp_Click(object sender, EventArgs e)
@@ -570,13 +543,12 @@ namespace ChartButlerCS
 
                     if (chartButlerDataSet.ChartButler.Count > 0)
                     {
-                        if (chartButlerDataSet.ChartButler[0].IsDataSourceNull())
-                            chartButlerDataSet.ChartButler[0].DataSource = "GAT24";
-                       
-                        Settings.Default.DataSource = chartButlerDataSet.ChartButler[0].DataSource;
+                        dataSource = chartButlerDataSet.ChartButler[0].IsDataSourceNull()
+                            ? "GAT24"
+                            : chartButlerDataSet.ChartButler[0].DataSource;
                     }
                     else
-                        Settings.Default.DataSource = null;
+                        dataSource = null;
 
                 }
                 else
@@ -651,7 +623,7 @@ namespace ChartButlerCS
                 chartButlerDataSet.ChartButler.AddChartButlerRow("", "");
             chartButlerDataSet.ChartButler[0].Version = 
                 System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            chartButlerDataSet.ChartButler[0].DataSource = Settings.Default.DataSource;
+            chartButlerDataSet.ChartButler[0].DataSource = dataSource;
 
             if (Settings.Default.ChartFolder.Length > 0)
             {
@@ -674,10 +646,23 @@ namespace ChartButlerCS
             }
         }
 
+        private void checkAndPromptMigration()
+        {
+            if (dataSource != "GAT24")
+                return;
+
+            MessageBox.Show(this,
+                "Hinweis: Die aktuelle Karten-Datenbank verwendet noch GAT24 als Datenquelle, " +
+                "welche nicht mehr unterstützt wird." + Environment.NewLine + Environment.NewLine +
+                "Beim nächsten Karten-Update wird die Datenbank automatisch auf die " +
+                "DFS BasicVFR Datenquelle migriert.",
+                "Migration erforderlich", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
         /// <summary>
         /// Wechselt die Datenquelle der aktuell geladenen Datenbank.
-        /// Hierfür werden zunächst alle Karten aus dem kartenverzeichnis gelöscht und dann alle
-        /// abbonnierten Flugplätze erneut zur Datenbank hinzu gefügt.
+        /// Hierfür werden zunächst alle Karten aus dem Kartenverzeichnis gelöscht und dann alle
+        /// abonnierten Flugplätze erneut zur Datenbank hinzugefügt.
         /// </summary>
         private void switchDataBaseDataSource()
         {
@@ -706,10 +691,11 @@ namespace ChartButlerCS
 
                 if (chartButlerDataSet.Airfields.Count != fieldsICAO.Length)
                 {
-                    if (DialogResult.Cancel == MessageBox.Show("Entschuldigung! " + Environment.NewLine + 
+                    if (DialogResult.Cancel == MessageBox.Show(this,
+                        "Entschuldigung!" + Environment.NewLine +
                         "Es konnten leider nur " + chartButlerDataSet.Airfields.Count.ToString() + " von " +
-                        fieldsICAO.Length.ToString() + " Flugplätzen herunter geladen werden!",
-                        "Wechsel der Datenquelle", 
+                        fieldsICAO.Length.ToString() + " Flugplätzen heruntergeladen werden!",
+                        "Migration auf DFS",
                         MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2))
                     {
                         throw new Exception();

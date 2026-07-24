@@ -36,13 +36,11 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.previewPictureBox = new System.Windows.Forms.PictureBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.cmdNewAF = new System.Windows.Forms.Button();
             this.cmdUpdateCharts = new System.Windows.Forms.Button();
             this.cmdClose = new System.Windows.Forms.Button();
             this.cmdOptions = new System.Windows.Forms.Button();
             this.cmdHelp = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel_updateRequired = new System.Windows.Forms.Panel();
@@ -55,7 +53,6 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.previewPictureBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel_updateRequired.SuspendLayout();
@@ -120,18 +117,6 @@
             this.toolTip1.SetToolTip(this.previewPictureBox, "Doppelklick, um Karte in einer externen Anwendung anzuzeigen/zu drucken.");
             this.previewPictureBox.DoubleClick += new System.EventHandler(this.previewPictureBox_DoubleClick);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.pictureBox1.Location = new System.Drawing.Point(4, 146);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(222, 200);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 14;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Visible = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
-            // 
             // cmdNewAF
             // 
             this.cmdNewAF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -189,28 +174,13 @@
             this.cmdHelp.UseVisualStyleBackColor = true;
             this.cmdHelp.Click += new System.EventHandler(this.cmdHelp_Click);
             // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(38, 125);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(149, 18);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Kartenmaterial von";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label1.Visible = false;
-            // 
             // panel1
             // 
             this.panel1.Controls.Add(this.cmdNewAF);
             this.panel1.Controls.Add(this.cmdUpdateCharts);
             this.panel1.Controls.Add(this.cmdClose);
             this.panel1.Controls.Add(this.cmdHelp);
-            this.panel1.Controls.Add(this.pictureBox1);
             this.panel1.Controls.Add(this.cmdOptions);
-            this.panel1.Controls.Add(this.label1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel1.Location = new System.Drawing.Point(474, 0);
             this.panel1.MinimumSize = new System.Drawing.Size(222, 412);
@@ -287,7 +257,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.previewPictureBox)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
@@ -311,8 +280,6 @@
         private System.Windows.Forms.Button cmdClose;
         private System.Windows.Forms.Button cmdOptions;
         private System.Windows.Forms.Button cmdHelp;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox previewPictureBox;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
