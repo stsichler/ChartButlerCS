@@ -32,9 +32,21 @@ namespace ChartButlerCS
         string errorText;
 
         /// <summary>
-        /// HttpClient zur Serverkommunikation
+        /// HttpClient zur Serverkommunikation.
+        /// Verwendet ServerCertificateValidationCallback, um bei nicht vertrauenswürdigen
+        /// Server-Zertifikaten den Benutzer nach dauerhafter Akzeptanz zu fragen.
         /// </summary>
-        HttpClient httpClient = new HttpClient();
+        HttpClient httpClient = CreateHttpClient();
+
+        private static HttpClient CreateHttpClient()
+        {
+            HttpClientHandler handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (request, certificate, chain, sslPolicyErrors) =>
+                    ServerCertificateValidationCallback(request, certificate, chain, sslPolicyErrors)
+            };
+            return new HttpClient(handler);
+        }
 
         /// <summary>
         /// Status Dialog, der den Fortschritt anzeigt.

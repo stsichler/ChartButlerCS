@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.Net;
+using System.Net.Http;
 using System.Windows.Forms;
 using System.IO;
 using System.Xml;
@@ -62,7 +63,7 @@ namespace ChartButlerCS
             try
             {
                 DFS_MainURL = new Uri(new Uri(Properties.Resources.DFS_PermalinkBaseURL), Properties.Resources.DFS_PermalinkMain);
-                string text = DFS_GetRedirectURLText2(ref DFS_MainURL);
+                string text = DFS_GetRedirectURLText(ref DFS_MainURL);
 
                 sts.Invoke((MethodInvoker)delegate { sts.progressBar.PerformStep(); });
 
@@ -82,9 +83,9 @@ namespace ChartButlerCS
             }
             catch (Exception exc) 
             {
-                string assemblyVersion = typeof(HttpWebRequest).Assembly.GetName().Version.ToString();
+                string assemblyVersion = typeof(HttpClient).Assembly.GetName().Version.ToString();
                 // try to find of exact file version of System Assembly
-                object[] ver = typeof(HttpWebRequest).Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
+                object[] ver = typeof(HttpClient).Assembly.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true);
                 if (ver.Length > 0)
                     assemblyVersion = ((AssemblyFileVersionAttribute)ver[0]).Version;
 
@@ -395,7 +396,7 @@ namespace ChartButlerCS
         /// <returns>Eine Liste mit den Download-Links</returns>
         private List<DFS_ChartLink> DFS_GetChartLinks(string ICAO, Uri AFSite)
         {
-            string AFstream = DFS_GetRedirectURLText2(ref AFSite);
+            string AFstream = DFS_GetRedirectURLText(ref AFSite);
 
             // Permalink extrahieren
 
@@ -590,7 +591,7 @@ namespace ChartButlerCS
         /// oder DateTime(), falls es nicht extrahiert werden konnte.</returns>
         public DateTime DFS_DownloadChartFromURL(string path, Uri URL)
         {
-            string text = Utility.GetURLText2(httpClient, URL);
+            string text = Utility.GetURLText(httpClient, URL);
 
             // Hinweis: Permalink extrahieren wird im Moment nicht benötigt
 
@@ -781,16 +782,16 @@ namespace ChartButlerCS
         /// </summary>
         /// <param name="uri">Die abzurufende (Permalink) URL. Die URI wird auf die Weiterleitung gesetzt</param>
         /// <returns>Der HTML Text der Zielseite</returns>
-        public string DFS_GetRedirectURLText2(ref Uri uri)
+        public string DFS_GetRedirectURLText(ref Uri uri)
         {
-            string text = Utility.GetURLText2(httpClient, uri);
+            string text = Utility.GetURLText(httpClient, uri);
             int pos = 0;
             string relative_redirect_url = Utility.GetTextBetweenRegex(text,
                 new Regex(@"<meta\s+http-equiv=""Refresh""\s+content=""0;\s*url="), new Regex(@""""), ref pos);
             if (pos != -1)
             {
                 uri = new Uri(uri, relative_redirect_url);
-                text = Utility.GetURLText2(httpClient, uri);
+                text = Utility.GetURLText(httpClient, uri);
             }
             return text;
         }
@@ -825,7 +826,7 @@ namespace ChartButlerCS
                 // Flugplatzliste holen
 
                 Uri AirfieldsUri = new Uri(Properties.Resources.DFS_PermalinkBaseURL + Properties.Resources.DFS_PermalinkAirfields);
-                string text = DFS_GetRedirectURLText2(ref AirfieldsUri);
+                string text = DFS_GetRedirectURLText(ref AirfieldsUri);
 
                 MatchCollection page_matches = Regex.Matches(text,
                     @"<a\s+class=""folder-link""\s+href=""([^""]*)""\s*>\s*<span\s+lang=""de""\s+class=""folder-name"">([A-Z](-[A-Z])?)\s*</span>");
@@ -838,7 +839,7 @@ namespace ChartButlerCS
                     string letters = page_match.Groups[2].Value;
                     sts.Invoke((MethodInvoker)delegate { sts.txtProgress.AppendText("Lade Flugplatzliste " + letters + "... "); });
 
-                    text = Utility.GetURLText2(httpClient, new Uri(AirfieldsUri, page_href));
+                    text = Utility.GetURLText(httpClient, new Uri(AirfieldsUri, page_href));
 
                     MatchCollection airfield_matches = Regex.Matches(text,
                         @"<a\s+class=""folder-link""\s+href=""([^""]*)""\s*>\s*<span\s+lang=""de""\s+class=""folder-name"">([^<]+)</span>");

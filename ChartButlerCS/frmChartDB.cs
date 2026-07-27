@@ -6,8 +6,9 @@ using System.Windows.Forms;
 using System.IO;
 using System.Runtime.Remoting.Contexts;
 using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
 using System.Web.Script.Serialization;
 
 namespace ChartButlerCS
@@ -123,7 +124,7 @@ namespace ChartButlerCS
             if (showOptions)
                 cmdOptions_Click(this, new EventArgs());
 #if !DEBUG
-            beginCheckForLatestRelease();
+            checkForLatestReleaseAsync();
 #endif
         }
 
@@ -133,8 +134,7 @@ namespace ChartButlerCS
             contextMenuStrip1.SuspendLayout();
             try
             {
-                if (checkLatestReleaseWebRequest != null)
-                    checkLatestReleaseWebRequest.Abort();
+                checkLatestReleaseCts?.Cancel();
             }
             catch (Exception) { }
         }
@@ -766,60 +766,46 @@ namespace ChartButlerCS
             }
         }
 
-        private HttpWebRequest checkLatestReleaseWebRequest = null;
-        private void beginCheckForLatestRelease()
+        private static readonly HttpClient checkLatestReleaseHttpClient = CreateCheckLatestReleaseHttpClient();
+        private CancellationTokenSource checkLatestReleaseCts;
+
+        private static HttpClient CreateCheckLatestReleaseHttpClient()
         {
-            try
+            // Hinweis: akzeptiert wie bisher jedes Server-Zertifikat vorbehaltlos (siehe TODO.txt).
+            HttpClientHandler handler = new HttpClientHandler
             {
-                checkLatestReleaseWebRequest = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/stsichler/ChartButlerCS/releases/latest");
-                checkLatestReleaseWebRequest.ServerCertificateValidationCallback += (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => { return true; };
-                checkLatestReleaseWebRequest.Method = "GET";
-                checkLatestReleaseWebRequest.Accept = "application/vnd.github.v3+json";
-                checkLatestReleaseWebRequest.ContentType = "application/json;charset=utf-8";
-                checkLatestReleaseWebRequest.UserAgent = "ChartButlerCS";
-                checkLatestReleaseWebRequest.BeginGetResponse(new AsyncCallback(finishedCheckForLatestRelease), checkLatestReleaseWebRequest);
-            }
-            catch (Exception) { checkLatestReleaseWebRequest = null; }
+                ServerCertificateCustomValidationCallback = (request, certificate, chain, sslPolicyErrors) => true
+            };
+            HttpClient client = new HttpClient(handler);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("ChartButlerCS");
+            return client;
         }
 
-        private void finishedCheckForLatestRelease(IAsyncResult result)
+        private async void checkForLatestReleaseAsync()
         {
+            checkLatestReleaseCts = new CancellationTokenSource();
             string latestReleaseTag = "";
-
-            HttpWebResponse response = null;
-            Stream dataStream = null;
-            StreamReader streamReader = null;
             try
             {
-                response = (result.AsyncState as HttpWebRequest).EndGetResponse(result) as HttpWebResponse;
-                if (response.StatusCode == HttpStatusCode.OK)
+                using (HttpResponseMessage response = await checkLatestReleaseHttpClient.GetAsync(
+                    "https://api.github.com/repos/stsichler/ChartButlerCS/releases/latest", checkLatestReleaseCts.Token))
                 {
-                    dataStream = response.GetResponseStream();
-                    streamReader = new StreamReader(dataStream);
-                    string responseFromServer = streamReader.ReadToEnd();
-                    JavaScriptSerializer serializer = new JavaScriptSerializer();
-                    Dictionary<string, object> entries = serializer.Deserialize<Dictionary<string, object>>(responseFromServer);
-                    latestReleaseTag = entries["tag_name"] as string;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        string responseFromServer = await response.Content.ReadAsStringAsync();
+                        JavaScriptSerializer serializer = new JavaScriptSerializer();
+                        Dictionary<string, object> entries = serializer.Deserialize<Dictionary<string, object>>(responseFromServer);
+                        latestReleaseTag = entries["tag_name"] as string;
+                    }
                 }
             }
-            catch (Exception) {}
-            finally
-            {
-                if (streamReader != null)
-                    streamReader.Dispose();
-                if (dataStream != null)
-                    dataStream.Dispose();
-                if (response != null)
-                    response.Dispose();
-            }
+            catch (Exception) { }
 
             if (latestReleaseTag != "" && latestReleaseTag != ("v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()))
             {
-                Invoke((MethodInvoker)delegate {
-                    newReleaseAvailable = true;
-                    updateUpdateRequiredPanel();
-                });
-
+                newReleaseAvailable = true;
+                updateUpdateRequiredPanel();
             }
         }
 

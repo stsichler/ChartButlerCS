@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
-using System.Net.Security;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace ChartButlerCS
 {
@@ -23,46 +22,31 @@ namespace ChartButlerCS
                 "." + chartRow.Cname + "_preview." + extension);
         }
 
-        /// <summary>
-        /// Lädt Daten von einer URL und speichert sie als Datei.
-        /// </summary>
-        /// <param name="URL">Die auszulesende URL</param>
-        /// <param name="filePath">lokaler Zielpfad</param>
-        public static void DownloadFileFromURL(string filePath, string URL)
-        {
-            using (WebClient dlcl = new WebClient())
-            {
-                dlcl.DownloadFile(new Uri(URL), filePath);
-            }
-        }
+        // /// <summary>
+        // /// Lädt Daten von einer URL und speichert sie als Datei.
+        // /// </summary>
+        // /// <param name="httpClient">Der zu verwendende HttpClient.</param>
+        // /// <param name="filePath">lokaler Zielpfad</param>
+        // /// <param name="URL">Die auszulesende URL</param>
+        // public static async Task DownloadFileFromURL(HttpClient httpClient, string filePath, string URL)
+        // {
+        //     using (HttpResponseMessage response = await httpClient.GetAsync(new Uri(URL), HttpCompletionOption.ResponseHeadersRead))
+        //     {
+        //         response.EnsureSuccessStatusCode();
+        //         using (FileStream fileStream = File.Create(filePath))
+        //         {
+        //             await response.Content.CopyToAsync(fileStream);
+        //         }
+        //     }
+        // }
 
         /// <summary>
         /// Öffnet eine URL und stellt den Inhalt als Quelltext zur Verfügung.
         /// </summary>
+        /// <param name="httpClient">Der zu verwendende HttpClient.</param>
         /// <param name="URL">Die auszulesende URL.</param>
         /// <returns>Der Seiten-Quelltext der URL als string-Objekt.</returns>
-        public static string GetURLText(string URL, RemoteCertificateValidationCallback serverCertificateValidationCallback)
-        {
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(URL);
-            request.ServerCertificateValidationCallback += serverCertificateValidationCallback;
-            request.Method = "GET";
-            request.ContentType = "text/html;charset=iso-8859-1";
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            StreamReader dlread = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding("ISO-8859-1"));
-            string responseText = dlread.ReadToEnd();
-            response.Close();
-            dlread.Close();
-            return responseText;
-        }
-
-        /// <summary>
-        /// Öffnet eine URL und stellt den Inhalt als Quelltext zur Verfügung.
-        /// Diese Methode ist praktisch identisch zu GetURLText, aber entspricht der Empfehlung
-        /// HttpWebRequest durch HttpClient zu ersetzen.
-        /// </summary>
-        /// <param name="URL">Die auszulesende URL.</param>
-        /// <returns>Der Seiten-Quelltext der URL als string-Objekt.</returns>
-        public static string GetURLText2(HttpClient httpClient, Uri URL)
+        public static string GetURLText(HttpClient httpClient, Uri URL)
         {
             var httpResponseTask = httpClient.GetAsync(URL);
             httpResponseTask.Wait();
