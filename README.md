@@ -1,5 +1,8 @@
 # ChartButlerCS [<img src="./ChartButlerCS/Icon1.png" width="64" height="64" align="left" />](https://stsichler.github.io/ChartButlerCS/)
 
+> **ChartButlerCS wird nicht mehr weiterentwickelt. Nachfolger ist [ChartAssist](https://stsichler.github.io/ChartAssist/).**
+> ChartAssist greift nicht selbst auf die DFS zu: Sie rufen die Seiten im Browser auf, ChartAssist übernimmt den Rest. Ihr bisheriges Kartenverzeichnis können Sie weiterverwenden.
+
 [**> Aktuelle Version hier herunterladen <**](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
 
 [![Version](https://img.shields.io/github/v/release/stsichler/ChartButlerCS?label=version&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip) [![Downloads](https://img.shields.io/github/downloads/stsichler/ChartButlerCS/latest/total?label=Downloads&style=for-the-badge)](https://github.com/stsichler/ChartButlerCS/releases/latest/download/ChartButlerCS.zip)
@@ -50,7 +53,7 @@ Falls als Datenquelle "DFS BasicVFR" gewählt ist:
 
 Kartenmaterial bereitgestellt durch [DFS Deutsche Flugsicherung GmbH](https://aip.dfs.de/BasicVFR).
 
-**ACHTUNG: Die Nutzung der AIP mit diesem Tool erfordert eventuell eine schriftliche Zustimmung durch die DFS, siehe [Nutzungsbedingungen](https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp)**
+**ACHTUNG: Die DFS hat bestätigt, dass ihre [Nutzungsbedingungen](https://ais.dfs.de/pilotservice/service/information/disclaimer/disclaimer.jsp) auch für die BasicVFR gelten. Sie verbieten die Nutzung mit automatisierten Tools (§2). ChartButlerCS lädt die Karten automatisch herunter und verstößt damit gegen diese Bedingungen. Die Entscheidung über die Nutzung liegt bei Ihnen.**
 
 
 Herzlichen Dank an Christoph Wildenmann für die Erstellung des Programm-Icons.
